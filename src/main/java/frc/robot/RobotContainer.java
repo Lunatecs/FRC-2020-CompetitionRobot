@@ -28,9 +28,11 @@ public class RobotContainer {
 
   private final Joystick driverJoystick = new Joystick(ControllerConstants.Joystick_USB_Driver);
   private final DrivetrainSubsystem driveTrain = new DrivetrainSubsystem();
+  
+  //Negative on Y Axis to invert forward and backward 
   private final DriveWithJoysticksCommand joystickDrive = new DriveWithJoysticksCommand(driveTrain, 
-                                                                        () -> {return driverJoystick.getRawAxis(1);}, 
-                                                                        () -> { return driverJoystick.getRawAxis(4);});
+                                                                        () -> {return -driverJoystick.getRawAxis(ControllerConstants.Joystick_Left_Y_Axis);}, 
+                                                                        () -> { return driverJoystick.getRawAxis(ControllerConstants.Joystick_Right_X_Axis);});
 
 
   /**
