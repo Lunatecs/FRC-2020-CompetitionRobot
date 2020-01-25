@@ -16,4 +16,27 @@ package frc.robot;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+    
+    public static final class DrivetrainConstants {
+        public static final int Right_Front_ID = 0;
+        public static final int Right_Back_ID = 0;
+
+        public static final int Left_Front_ID = 0;
+        public static final int Left_Back_ID = 0;
+    }
+
+    public static final class ControllerConstants {
+        public static final int Joystick_USB_Driver = 0;
+        public static final int Joystick_USB_Operator = 1;
+
+        public static final int Joystick_Right_X_Axis = 4;
+        public static final int Joystick_Right_Y_Axis = 5;
+        public static final int Joystick_Left_X_Axis = 0;
+        public static final int Joystick_Left_Y_Axis = 1;
+
+        public static final int Red_Button_ID = 2;
+        public static final int Green_Button_ID = 1;
+        public static final int Yellow_Button_ID = 4;
+        public static final int Blue_Button_ID = 3;
+    }
 }
