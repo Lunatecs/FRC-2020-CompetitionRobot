@@ -23,6 +23,8 @@ public final class Constants {
 
         public static final int Left_Front_ID = 14;
         public static final int Left_Back_ID = 15;
+
+        public static final double secondsFromNeutralToFull = 0.25;
     }
 
     public static final class ControllerConstants {

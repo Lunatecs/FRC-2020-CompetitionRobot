@@ -67,6 +67,16 @@ public class DrivetrainSubsystem extends SubsystemBase {
     this.leftFront.setSelectedSensorPosition(0);
   }
 
+  public void setRamp(boolean status) {
+    if (status == true) {
+      this.rightFront.configOpenloopRamp(DrivetrainConstants.secondsFromNeutralToFull, 10);
+      this.leftFront.configOpenloopRamp(DrivetrainConstants.secondsFromNeutralToFull, 10);
+    } else {
+      this.rightFront.configOpenloopRamp(0, 10);
+      this.leftFront.configOpenloopRamp(0, 10);
+    }
+  }
+
   @Override
   public void periodic() {
     SmartDashboard.putNumber("R Encoder", this.getRightEncoder());
