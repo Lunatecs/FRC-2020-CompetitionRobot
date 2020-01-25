@@ -40,5 +40,11 @@ public final class Constants {
         public static final int Green_Button_ID = 1;
         public static final int Yellow_Button_ID = 4;
         public static final int Blue_Button_ID = 3;
+
+        public static final int Left_Bumper_ID = 5;
+        public static final int Right_Bumper_ID = 6;
+
+        public static final int Left_Trigger_ID = 2;
+        public static final int Right_Trigger_ID = 3;
     }
 }
