@@ -36,6 +36,9 @@ public final class Constants {
         public static final int Joystick_Left_X_Axis = 0;
         public static final int Joystick_Left_Y_Axis = 1;
 
+        public static final int Joystick_Right_Button_ID = 10;
+        public static final int Joystick_Left_Button_ID = 9;
+
         public static final int Red_Button_ID = 2;
         public static final int Green_Button_ID = 1;
         public static final int Yellow_Button_ID = 4;
@@ -46,5 +49,8 @@ public final class Constants {
 
         public static final int Left_Trigger_ID = 2;
         public static final int Right_Trigger_ID = 3;
+
+        public static final int Left_Select_ID = 7;
+        public static final int Right_Select_ID = 8;
     }
 }
