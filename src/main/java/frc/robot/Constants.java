@@ -27,6 +27,16 @@ public final class Constants {
         public static final double secondsFromNeutralToFull = 0.25;
     }
 
+    public static final class IntakeConstants {
+        public static final int Rollers_ID = 0;
+        public static final int Intake_Forward_ID = 0;
+        public static final int Intake_Backward_ID = 0;
+    }
+
+    public static final class FeederConstants {
+        public static final int Guiders_ID = 0;
+    }
+
     public static final class ControllerConstants {
         public static final int Joystick_USB_Driver = 0;
         public static final int Joystick_USB_Operator = 1;
