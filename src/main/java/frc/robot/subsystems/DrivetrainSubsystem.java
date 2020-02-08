@@ -77,6 +77,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
     }
   }
 
+  public void setMaxOutput(double output) {
+    drive.setMaxOutput(output);
+  }
+
   @Override
   public void periodic() {
     SmartDashboard.putNumber("R Encoder", this.getRightEncoder());

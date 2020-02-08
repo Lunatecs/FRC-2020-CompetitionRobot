@@ -9,6 +9,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -51,6 +52,13 @@ public class RobotContainer {
    * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+    new JoystickButton(driverJoystick, ControllerConstants.Right_Bumper_ID)
+                                                                    .whenPressed(() -> driveTrain.setMaxOutput(0.5))
+                                                                    .whenReleased(() -> driveTrain.setMaxOutput(1));
+
+    new JoystickButton(driverJoystick, ControllerConstants.Left_Bumper_ID)
+                                                                    .whenPressed(() -> driveTrain.setMaxOutput(0.25))
+                                                                    .whenReleased(() -> driveTrain.setMaxOutput(1));
   }
 
   private void configureDefaultCommands() {
