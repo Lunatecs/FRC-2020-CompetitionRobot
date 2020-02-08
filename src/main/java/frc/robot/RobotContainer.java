@@ -7,11 +7,16 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import frc.robot.commands.ExampleCommand;
-import frc.robot.subsystems.ExampleSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
+
+import frc.robot.Constants.ControllerConstants;
+import frc.robot.commands.DriveWithJoysticksCommand;
+import frc.robot.subsystems.DrivetrainSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -21,10 +26,14 @@ import edu.wpi.first.wpilibj2.command.Command;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
 
-  private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
-
+  private final Joystick driverJoystick = new Joystick(ControllerConstants.Joystick_USB_Driver);
+  private final DrivetrainSubsystem driveTrain = new DrivetrainSubsystem();
+  
+  //Negative on Y Axis to invert forward and backward 
+  private final DriveWithJoysticksCommand joystickDrive = new DriveWithJoysticksCommand(driveTrain, 
+                                                                        () -> {return -driverJoystick.getRawAxis(ControllerConstants.Joystick_Left_Y_Axis);}, 
+                                                                        () -> { return driverJoystick.getRawAxis(ControllerConstants.Joystick_Right_X_Axis);});
 
 
   /**
@@ -33,6 +42,7 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
+    configureDefaultCommands();
   }
 
   /**
@@ -42,6 +52,19 @@ public class RobotContainer {
    * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+    new JoystickButton(driverJoystick, ControllerConstants.Right_Bumper_ID)
+                                                                    .whenPressed(() -> driveTrain.setMaxOutput(0.5))
+                                                                    .whenReleased(() -> driveTrain.setMaxOutput(1));
+
+    new JoystickButton(driverJoystick, ControllerConstants.Left_Bumper_ID)
+                                                                    .whenPressed(() -> driveTrain.setMaxOutput(0.25))
+                                                                    .whenReleased(() -> driveTrain.setMaxOutput(1));
+  }
+
+  private void configureDefaultCommands() {
+    CommandScheduler scheduler = CommandScheduler.getInstance();
+    scheduler.setDefaultCommand(driveTrain, joystickDrive);
+    //scheduler.registerSubsystem(driveTrain);
   }
 
 
@@ -50,8 +73,8 @@ public class RobotContainer {
    *
    * @return the command to run in autonomous
    */
-  public Command getAutonomousCommand() {
-    // An ExampleCommand will run in autonomous
-    return m_autoCommand;
-  }
+  // public Command getAutonomousCommand() {
+  //   // An ExampleCommand will run in autonomous
+  //   return m_autoCommand;
+  // }
 }
