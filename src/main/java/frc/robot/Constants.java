@@ -37,6 +37,10 @@ public final class Constants {
         public static final int Guiders_ID = 0;
     }
 
+    public static final class TowerConstants {
+        public static final int Conveyor_ID = 0;
+    }
+
     public static final class ControllerConstants {
         public static final int Joystick_USB_Driver = 0;
         public static final int Joystick_USB_Operator = 1;
