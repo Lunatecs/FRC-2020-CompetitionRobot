@@ -15,8 +15,10 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 
 import frc.robot.Constants.ControllerConstants;
+import frc.robot.buttons.JoystickAxisButton;
 import frc.robot.commands.DriveWithJoysticksCommand;
 import frc.robot.subsystems.DrivetrainSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -29,13 +31,14 @@ public class RobotContainer {
 
   private final Joystick driverJoystick = new Joystick(ControllerConstants.Joystick_USB_Driver);
   private final DrivetrainSubsystem driveTrain = new DrivetrainSubsystem();
+  private final IntakeSubsystem intake = new IntakeSubsystem();
   
   //Negative on Y Axis to invert forward and backward 
   private final DriveWithJoysticksCommand joystickDrive = new DriveWithJoysticksCommand(driveTrain, 
                                                                         () -> {return -driverJoystick.getRawAxis(ControllerConstants.Joystick_Left_Y_Axis);}, 
                                                                         () -> { return driverJoystick.getRawAxis(ControllerConstants.Joystick_Right_X_Axis);});
 
-
+                                                                        
   /**
    * The container for the robot.  Contains subsystems, OI devices, and commands.
    */
@@ -52,13 +55,27 @@ public class RobotContainer {
    * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    new JoystickButton(driverJoystick, ControllerConstants.Right_Bumper_ID)
+
+    new JoystickAxisButton(driverJoystick, ControllerConstants.Right_Trigger_ID)
                                                                     .whenPressed(() -> driveTrain.setMaxOutput(0.5))
                                                                     .whenReleased(() -> driveTrain.setMaxOutput(1));
 
-    new JoystickButton(driverJoystick, ControllerConstants.Left_Bumper_ID)
+    new JoystickAxisButton(driverJoystick, ControllerConstants.Left_Trigger_ID)
                                                                     .whenPressed(() -> driveTrain.setMaxOutput(0.25))
                                                                     .whenReleased(() -> driveTrain.setMaxOutput(1));
+
+
+    new JoystickButton(driverJoystick, ControllerConstants.Right_Bumper_ID)
+                                                                    .whenPressed(() -> intake.setIntakeSpeed(1))
+                                                                    .whenReleased(() -> intake.setIntakeSpeed(0));
+
+    new JoystickButton(driverJoystick, ControllerConstants.Left_Bumper_ID)
+                                                                    .whenPressed(() -> intake.setIntakeSpeed(-1))
+                                                                    .whenReleased(() -> intake.setIntakeSpeed(0));
+
+    
+    new JoystickButton(driverJoystick, ControllerConstants.Blue_Button_ID).whenPressed(() -> intake.lowerIntake());
+    new JoystickButton(driverJoystick, ControllerConstants.Red_Button_ID).whenPressed(()-> intake.raiseIntake());
   }
 
   private void configureDefaultCommands() {
