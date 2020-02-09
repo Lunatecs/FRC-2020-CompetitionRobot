@@ -41,6 +41,14 @@ public final class Constants {
         public static final int Conveyor_ID = 0;
     }
 
+    public static final class ShooterConstants {
+        public static final int Turret_ID = 0;
+        public static final int Flywheel_Left_ID = 0;
+        public static final int Flywheel_Right_ID = 0;
+        public static final int Hood_Forward_ID = 0;
+        public static final int Hood_Reverse_ID = 0;
+    }
+
     public static final class ControllerConstants {
         public static final int Joystick_USB_Driver = 0;
         public static final int Joystick_USB_Operator = 1;
