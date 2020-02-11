@@ -27,6 +27,29 @@ public final class Constants {
         public static final double secondsFromNeutralToFull = 0.25;
     }
 
+    public static final class IntakeConstants {
+        public static final int Rollers_ID = 6;
+        public static final int Intake_Forward_ID = 3;
+        public static final int Intake_Backward_ID = 4;
+    }
+
+    public static final class FeederConstants {
+        public static final int Guiders_Left_ID = 5;
+        public static final int Guiders_Right_ID = 9;
+    }
+
+    public static final class TowerConstants {
+        public static final int Conveyor_ID = 2;
+    }
+
+    public static final class ShooterConstants {
+        public static final int Turret_ID = 1;
+        public static final int Flywheel_Left_ID = 1;
+        public static final int Flywheel_Right_ID = 2;
+        public static final int Hood_Forward_ID = 1;
+        public static final int Hood_Reverse_ID = 2;
+    }
+
     public static final class ControllerConstants {
         public static final int Joystick_USB_Driver = 0;
         public static final int Joystick_USB_Operator = 1;
