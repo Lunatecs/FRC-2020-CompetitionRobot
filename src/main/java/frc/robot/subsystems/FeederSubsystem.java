@@ -16,15 +16,18 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class FeederSubsystem extends SubsystemBase {
 
-  private final WPI_VictorSPX guiders = new WPI_VictorSPX(FeederConstants.Guiders_ID);
+  private final WPI_VictorSPX left_guiders = new WPI_VictorSPX(FeederConstants.Guiders_Left_ID);
+  private final WPI_VictorSPX right_guiders = new WPI_VictorSPX(FeederConstants.Guiders_Right_ID);
   private static NeutralMode FEEDER_NEUTRALMODE = NeutralMode.Brake;
 
   /**
    * Creates a new FeederSubsystem.
    */
   public FeederSubsystem() {
-    guiders.configFactoryDefault();
-    guiders.setNeutralMode(FEEDER_NEUTRALMODE);
+    left_guiders.configFactoryDefault();
+    right_guiders.configFactoryDefault();
+    left_guiders.setNeutralMode(FEEDER_NEUTRALMODE);
+    right_guiders.setNeutralMode(FEEDER_NEUTRALMODE);
   }
 
   @Override
@@ -37,6 +40,7 @@ public class FeederSubsystem extends SubsystemBase {
    * @param speed
    */
   public void setFeederSpeed(double speed) {
-    guiders.set(ControlMode.PercentOutput, speed);
+    left_guiders.set(ControlMode.PercentOutput, speed);
+    right_guiders.set(ControlMode.PercentOutput, speed);
   }
 }

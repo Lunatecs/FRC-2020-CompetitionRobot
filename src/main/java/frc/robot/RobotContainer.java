@@ -19,6 +19,9 @@ import frc.robot.buttons.JoystickAxisButton;
 import frc.robot.commands.DriveWithJoysticksCommand;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.TowerSubsystem;
+import frc.robot.subsystems.FeederSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -32,13 +35,16 @@ public class RobotContainer {
   private final Joystick driverJoystick = new Joystick(ControllerConstants.Joystick_USB_Driver);
   private final DrivetrainSubsystem driveTrain = new DrivetrainSubsystem();
   private final IntakeSubsystem intake = new IntakeSubsystem();
+  private final ShooterSubsystem shooter = new ShooterSubsystem();
+  private final TowerSubsystem tower = new TowerSubsystem();
+  private final FeederSubsystem feeder = new FeederSubsystem();
   
   //Negative on Y Axis to invert forward and backward 
   private final DriveWithJoysticksCommand joystickDrive = new DriveWithJoysticksCommand(driveTrain, 
                                                                         () -> {return -driverJoystick.getRawAxis(ControllerConstants.Joystick_Left_Y_Axis);}, 
                                                                         () -> { return driverJoystick.getRawAxis(ControllerConstants.Joystick_Right_X_Axis);});
 
-                                                                        
+
   /**
    * The container for the robot.  Contains subsystems, OI devices, and commands.
    */
@@ -66,8 +72,14 @@ public class RobotContainer {
 
 
     new JoystickButton(driverJoystick, ControllerConstants.Right_Bumper_ID)
-                                                                    .whenPressed(() -> intake.setIntakeSpeed(1))
-                                                                    .whenReleased(() -> intake.setIntakeSpeed(0));
+                                                                    .whenPressed(() -> {intake.setIntakeSpeed(1);
+                                                                                        shooter.setFlyWheelSpeed(1);
+                                                                                        feeder.setFeederSpeed(-1);
+                                                                                        tower.setConveyorSpeed(1);})
+                                                                    .whenReleased(() -> {intake.setIntakeSpeed(0);
+                                                                                        shooter.setFlyWheelSpeed(0);
+                                                                                        feeder.setFeederSpeed(0);
+                                                                                        tower.setConveyorSpeed(0);});
 
     new JoystickButton(driverJoystick, ControllerConstants.Left_Bumper_ID)
                                                                     .whenPressed(() -> intake.setIntakeSpeed(-1))
