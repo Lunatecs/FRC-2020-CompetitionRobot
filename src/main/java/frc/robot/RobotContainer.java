@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.buttons.JoystickAxisButton;
 import frc.robot.commands.DriveWithJoysticksCommand;
+import frc.robot.commands.ShootWithTriggerCommand;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
@@ -33,6 +34,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
 
   private final Joystick driverJoystick = new Joystick(ControllerConstants.Joystick_USB_Driver);
+  private final Joystick operatorJoystick = new Joystick(ControllerConstants.Joystick_USB_Operator);
   private final DrivetrainSubsystem driveTrain = new DrivetrainSubsystem();
   private final IntakeSubsystem intake = new IntakeSubsystem();
   private final ShooterSubsystem shooter = new ShooterSubsystem();
@@ -41,9 +43,10 @@ public class RobotContainer {
   
   //Negative on Y Axis to invert forward and backward 
   private final DriveWithJoysticksCommand joystickDrive = new DriveWithJoysticksCommand(driveTrain, 
-                                                                        () -> {return -driverJoystick.getRawAxis(ControllerConstants.Joystick_Left_Y_Axis);}, 
-                                                                        () -> { return driverJoystick.getRawAxis(ControllerConstants.Joystick_Right_X_Axis);});
+                                                                        () -> { return -driverJoystick.getRawAxis(ControllerConstants.Left_Trigger_ID) + driverJoystick.getRawAxis(ControllerConstants.Right_Trigger_ID);}, 
+                                                                        () -> { return driverJoystick.getRawAxis(ControllerConstants.Joystick_Left_X_Axis);});
 
+  private final ShootWithTriggerCommand shootTrigger = new ShootWithTriggerCommand(shooter, () -> { return operatorJoystick.getRawAxis(ControllerConstants.Right_Trigger_ID);});
 
   /**
    * The container for the robot.  Contains subsystems, OI devices, and commands.
@@ -62,38 +65,53 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
 
-    new JoystickAxisButton(driverJoystick, ControllerConstants.Right_Trigger_ID)
-                                                                    .whenPressed(() -> driveTrain.setMaxOutput(0.5))
-                                                                    .whenReleased(() -> driveTrain.setMaxOutput(1));
+    // new JoystickButton(operatorJoystick, ControllerConstants.Right_Bumper_ID)
+    //                                                                 .whenPressed(() -> shooter.setFlyWheelSpeed(1))
+    //                                                                 .whenReleased(() -> shooter.setFlyWheelSpeed(0));
 
-    new JoystickAxisButton(driverJoystick, ControllerConstants.Left_Trigger_ID)
-                                                                    .whenPressed(() -> driveTrain.setMaxOutput(0.25))
-                                                                    .whenReleased(() -> driveTrain.setMaxOutput(1));
+    new JoystickButton(operatorJoystick, ControllerConstants.Left_Bumper_ID)
+                                                                    .whenPressed(() -> {feeder.setFeederSpeed(-1);
+                                                                                        tower.setConveyorSpeed(1);})
+                                                                    .whenReleased(() -> {feeder.setFeederSpeed(0);
+                                                                                        tower.setConveyorSpeed(0);});
+
+    // new JoystickAxisButton(driverJoystick, ControllerConstants.Right_Trigger_ID)
+    //                                                                 .whenPressed(() -> driveTrain.setMaxOutput(0.5))
+    //                                                                 .whenReleased(() -> driveTrain.setMaxOutput(1));
+
+    // new JoystickAxisButton(driverJoystick, ControllerConstants.Left_Trigger_ID)
+    //                                                                 .whenPressed(() -> driveTrain.setMaxOutput(0.25))
+    //                                                                 .whenReleased(() -> driveTrain.setMaxOutput(1));
 
 
     new JoystickButton(driverJoystick, ControllerConstants.Right_Bumper_ID)
-                                                                    .whenPressed(() -> {intake.setIntakeSpeed(1);
-                                                                                        shooter.setFlyWheelSpeed(1);
-                                                                                        feeder.setFeederSpeed(-1);
-                                                                                        tower.setConveyorSpeed(1);})
-                                                                    .whenReleased(() -> {intake.setIntakeSpeed(0);
-                                                                                        shooter.setFlyWheelSpeed(0);
-                                                                                        feeder.setFeederSpeed(0);
-                                                                                        tower.setConveyorSpeed(0);});
+                                                                    .whenPressed(() -> driveTrain.setMaxOutput(0.25))
+                                                                    .whenReleased(() -> driveTrain.setMaxOutput(1));
 
     new JoystickButton(driverJoystick, ControllerConstants.Left_Bumper_ID)
-                                                                    .whenPressed(() -> intake.setIntakeSpeed(-1))
-                                                                    .whenReleased(() -> intake.setIntakeSpeed(0));
+                                                                    .whenPressed(() -> driveTrain.setMaxOutput(.5))
+                                                                    .whenReleased(() -> driveTrain.setMaxOutput(1));
 
-    
-    new JoystickButton(driverJoystick, ControllerConstants.Blue_Button_ID).whenPressed(() -> intake.lowerIntake());
-    new JoystickButton(driverJoystick, ControllerConstants.Red_Button_ID).whenPressed(()-> intake.raiseIntake());
+    new JoystickButton(driverJoystick, ControllerConstants.Yellow_Button_ID).whenPressed(() -> 
+    { 
+      if (intake.isLowered()) {
+        intake.raiseIntake();
+      } else {
+        intake.lowerIntake();
+      }
+    });
+    new JoystickButton(driverJoystick, ControllerConstants.Green_Button_ID).whenPressed(() -> intake.setIntakeSpeed(1))
+                                                                          .whenReleased(() -> intake.setIntakeSpeed(0));
+    //new JoystickButton(driverJoystick, ControllerConstants.Blue_Button_ID).whenPressed(() -> intake.lowerIntake());
+    new JoystickButton(driverJoystick, ControllerConstants.Red_Button_ID).whenPressed(()-> intake.setIntakeSpeed(-1))
+                                                                          .whenReleased(() -> intake.setIntakeSpeed(0));
   }
 
   private void configureDefaultCommands() {
     CommandScheduler scheduler = CommandScheduler.getInstance();
     scheduler.setDefaultCommand(driveTrain, joystickDrive);
-    //scheduler.registerSubsystem(driveTrain);
+    scheduler.setDefaultCommand(shooter, shootTrigger);
+    scheduler.registerSubsystem(driveTrain);
   }
 
 
