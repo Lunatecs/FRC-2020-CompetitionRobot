@@ -24,7 +24,14 @@ public final class Constants {
         public static final int Left_Front_ID = 14;
         public static final int Left_Back_ID = 15;
 
+        public static final double DistancePerPulse = 0.0000202129;
+        public static final boolean GyroReversed = false;
+
         public static final double secondsFromNeutralToFull = 0.25;
+    }
+
+    public static final class ColorWheelConstants {
+        public static final int ColorWheel_ID = 3;
     }
 
     public static final class IntakeConstants {
