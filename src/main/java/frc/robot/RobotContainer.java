@@ -117,8 +117,7 @@ public class RobotContainer {
 
   private void configureDefaultCommands() {
     CommandScheduler scheduler = CommandScheduler.getInstance();
-    //scheduler.setDefaultCommand(driveTrain, joystickDrive);
-    scheduler.setDefaultCommand(driveTrain, swapDrive);
+    scheduler.setDefaultCommand(driveTrain, joystickDrive);
     //scheduler.setDefaultCommand(shooter, shootTrigger);
     //scheduler.registerSubsystem(driveTrain);
   }
