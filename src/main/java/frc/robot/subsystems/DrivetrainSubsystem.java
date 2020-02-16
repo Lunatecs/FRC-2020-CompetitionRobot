@@ -9,12 +9,14 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix.sensors.PigeonIMU;
 
 import static frc.robot.Constants.DrivetrainConstants;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.ColorWheelConstants;
 
 public class DrivetrainSubsystem extends SubsystemBase {
 
@@ -26,6 +28,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
   private static NeutralMode DRIVE_NEUTRALMODE = NeutralMode.Brake;
 
+  private PigeonIMU gyro = new PigeonIMU(ColorWheelConstants.ColorWheel_ID);
   private DifferentialDrive drive;
   /**
    * Creates a new DrivetrainSubsystem.
@@ -54,11 +57,49 @@ public class DrivetrainSubsystem extends SubsystemBase {
     drive.arcadeDrive(speed, rotation);
   }
 
-  public double getLeftEncoder() {
+  public void curvatureDrive(double speed, double rotation, boolean isQuickTurn) {
+    drive.curvatureDrive(speed, rotation, isQuickTurn);
+  }
+
+  public double getLeftEncoderDistance() {
+    return this.getLeftEncoderValue() * DrivetrainConstants.DistancePerPulse;
+  }
+
+  public double getRightEncoderDistance() {
+    return this.getRightEncoderValue() * DrivetrainConstants.DistancePerPulse;
+  }
+
+  public double getAvgEncoderDistance() {
+    return (this.getLeftEncoderDistance() + this.getRightEncoderDistance())/2;
+  }
+
+  public void tankDriveVolts(double leftVolts, double rightVolts) {
+    leftBack.setVoltage(leftVolts);
+    rightBack.setVoltage(-rightVolts);
+    drive.feed();
+  }
+
+  public void zeroAngle() {
+    gyro.setYaw(0);
+  }
+
+  public double getAngle() {
+    double[] ypr = new double[3];
+    gyro.getYawPitchRoll(ypr);
+    return Math.IEEEremainder(ypr[0], 360) * (DrivetrainConstants.GyroReversed ? -1.0 : 1.0);
+  }
+
+  public double getTurnRate() {
+    double[] dps = new double[3];
+    gyro.getRawGyro(dps);
+    return dps[0] * (DrivetrainConstants.GyroReversed ? -1.0 : 1.0);
+  }
+
+  public double getLeftEncoderValue() {
     return leftFront.getSelectedSensorPosition(0);
   }
 
-  public double getRightEncoder() {
+  public double getRightEncoderValue() {
     return rightFront.getSelectedSensorPosition(0);
   }
 
@@ -83,8 +124,12 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("R Encoder", this.getRightEncoder());
-    SmartDashboard.putNumber("L Encoder", this.getLeftEncoder());
+    SmartDashboard.putNumber("R Encoder", this.getRightEncoderValue());
+    SmartDashboard.putNumber("L Encoder", this.getLeftEncoderValue());
+    SmartDashboard.putNumber("R Encoder Distance", this.getRightEncoderDistance());
+    SmartDashboard.putNumber("L Encoder Distance", this.getLeftEncoderDistance());
+    SmartDashboard.putNumber("Gyro Angle", this.getAngle());
+    SmartDashboard.putNumber("Gyro Rate", this.getTurnRate());
     // This method will be called once per scheduler run
   }
 }
