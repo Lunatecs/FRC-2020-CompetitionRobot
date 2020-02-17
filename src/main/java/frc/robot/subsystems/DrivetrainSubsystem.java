@@ -9,6 +9,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.sensors.PigeonIMU;
 
 import static frc.robot.Constants.DrivetrainConstants;
@@ -28,7 +29,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
   private static NeutralMode DRIVE_NEUTRALMODE = NeutralMode.Brake;
 
-  private PigeonIMU gyro = new PigeonIMU(ColorWheelConstants.ColorWheel_ID);
+  private WPI_TalonSRX colorWheel = new WPI_TalonSRX(ColorWheelConstants.ColorWheel_ID);
+  private PigeonIMU gyro = new PigeonIMU(colorWheel);
   private DifferentialDrive drive;
   /**
    * Creates a new DrivetrainSubsystem.
