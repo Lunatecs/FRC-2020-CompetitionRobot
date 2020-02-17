@@ -155,7 +155,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
   }
 
   public DifferentialDriveWheelSpeeds gWheelSpeeds() {
-    return new DifferentialDriveWheelSpeeds(getLeftEncoderDistanceRate(), getRightEncoderDistance())
+    return new DifferentialDriveWheelSpeeds(getLeftEncoderDistanceRate(), getRightEncoderDistance());
   }
 
   public void resetOdometry(Pose2d pose) {
