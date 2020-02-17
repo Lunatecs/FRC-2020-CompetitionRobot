@@ -12,6 +12,8 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 
 import frc.robot.Constants.ControllerConstants;
@@ -43,18 +45,31 @@ public class RobotContainer {
   private final FeederSubsystem feeder = new FeederSubsystem();
 
   private final DriveWithJoysticksCommand joystickDrive = new DriveWithJoysticksCommand(driveTrain, 
-                                                                        () -> { return -driverJoystick.getRawAxis(ControllerConstants.Left_Trigger_ID) + driverJoystick.getRawAxis(ControllerConstants.Right_Trigger_ID);}, 
-                                                                        () -> { return driverJoystick.getRawAxis(ControllerConstants.Joystick_Left_X_Axis);});
+                                                                        () -> { return -driverJoystick.getRawAxis(ControllerConstants.Joystick_Left_Y_Axis);}, 
+                                                                     () -> { return driverJoystick.getRawAxis(ControllerConstants.Joystick_Right_X_Axis);});
   private final CurvatureWithJoysticksCommand curvatureDrive = new CurvatureWithJoysticksCommand(driveTrain,
                                                                         () -> { return -driverJoystick.getRawAxis(ControllerConstants.Left_Trigger_ID) + driverJoystick.getRawAxis(ControllerConstants.Right_Trigger_ID);},
-                                                                        () -> { return driverJoystick.getRawAxis(ControllerConstants.Joystick_Left_X_Axis);}, 
+                                                                        () -> 
+                                                                        { 
+                                                                          if ((Math.abs(driverJoystick.getRawAxis(ControllerConstants.Joystick_Left_X_Axis)) >= Math.abs((driverJoystick.getRawAxis(ControllerConstants.Joystick_Right_X_Axis))))) {
+                                                                            return driverJoystick.getRawAxis(ControllerConstants.Joystick_Left_X_Axis);
+                                                                          } else {
+                                                                            return driverJoystick.getRawAxis(ControllerConstants.Joystick_Right_X_Axis);
+                                                                          }
+                                                                        }, 
                                                                         () -> { return driverJoystick.getRawButton(ControllerConstants.Blue_Button_ID);});
   private final ShootWithTriggerCommand shootTrigger = new ShootWithTriggerCommand(shooter, () -> { return operatorJoystick.getRawAxis(ControllerConstants.Right_Trigger_ID);});
+  private String driveSelected;
+  private final SendableChooser<String> driveChooser = new SendableChooser<>();
 
   /**
    * The container for the robot.  Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+
+    driveChooser.setDefaultOption("Arcade", "Arcade");
+    driveChooser.addOption("Curve", "Curve");
+    SmartDashboard.putData("Drive choices", driveChooser);
     // Configure the button bindings
     configureButtonBindings();
     configureDefaultCommands();
@@ -91,13 +106,24 @@ public class RobotContainer {
     //                                                                 .whenReleased(() -> driveTrain.setMaxOutput(1));
 
     //--------Drivers Binds--------
+  }
+  //----------------------------
+
+  private void configureDefaultCommands() {
+    //CommandScheduler scheduler = CommandScheduler.getInstance();
+    //scheduler.setDefaultCommand(driveTrain, joystickDrive);
+    //scheduler.setDefaultCommand(shooter, shootTrigger);
+    //scheduler.registerSubsystem(driveTrain);
+  }
+
+  public void configureDriverButtonBindings(String drive) {
     new JoystickButton(driverJoystick, ControllerConstants.Right_Bumper_ID)
-                                                                    .whenPressed(() -> driveTrain.setMaxOutput(0.25))
-                                                                    .whenReleased(() -> driveTrain.setMaxOutput(1));
+                                                                          .whenPressed(() -> driveTrain.setMaxOutput(0.25))
+                                                                          .whenReleased(() -> driveTrain.setMaxOutput(1));
 
     new JoystickButton(driverJoystick, ControllerConstants.Left_Bumper_ID)
-                                                                    .whenPressed(() -> driveTrain.setMaxOutput(.5))
-                                                                    .whenReleased(() -> driveTrain.setMaxOutput(1));
+                                                                          .whenPressed(() -> driveTrain.setMaxOutput(.5))
+                                                                          .whenReleased(() -> driveTrain.setMaxOutput(1));
 
     new JoystickButton(driverJoystick, ControllerConstants.Yellow_Button_ID).whenPressed(() -> 
     { 
@@ -107,21 +133,36 @@ public class RobotContainer {
         intake.lowerIntake();
       }
     });
-    new JoystickButton(driverJoystick, ControllerConstants.Green_Button_ID).whenPressed(() -> intake.setIntakeSpeed(1))
-                                                                          .whenReleased(() -> intake.setIntakeSpeed(0));
-    //new JoystickButton(driverJoystick, ControllerConstants.Blue_Button_ID).whenPressed(() -> intake.lowerIntake());
-    new JoystickButton(driverJoystick, ControllerConstants.Red_Button_ID).whenPressed(()-> intake.setIntakeSpeed(-1))
-                                                                          .whenReleased(() -> intake.setIntakeSpeed(0));
-  }
-  //----------------------------
 
-  private void configureDefaultCommands() {
+    if(drive=="Arcade") {
+      new JoystickAxisButton(driverJoystick, ControllerConstants.Right_Trigger_ID)
+                                                                      .whenPressed(() -> intake.setIntakeSpeed(1))
+                                                                      .whenReleased(() -> intake.setIntakeSpeed(0));
+
+      new JoystickAxisButton(driverJoystick, ControllerConstants.Left_Trigger_ID)
+                                                                      .whenPressed(() -> intake.setIntakeSpeed(-1))
+                                                                      .whenReleased(() -> intake.setIntakeSpeed(0));
+    } else {
+      new JoystickButton(driverJoystick, ControllerConstants.Green_Button_ID).whenPressed(() -> intake.setIntakeSpeed(1))
+                                                                            .whenReleased(() -> intake.setIntakeSpeed(0));
+      //new JoystickButton(driverJoystick, ControllerConstants.Blue_Button_ID).whenPressed(() -> intake.lowerIntake());
+      new JoystickButton(driverJoystick, ControllerConstants.Red_Button_ID).whenPressed(()-> intake.setIntakeSpeed(-1))
+                                                                            .whenReleased(() -> intake.setIntakeSpeed(0));
+    }
+  }
+  
+  public void configureDriveDefault() {
     CommandScheduler scheduler = CommandScheduler.getInstance();
-    scheduler.setDefaultCommand(driveTrain, joystickDrive);
-    //scheduler.setDefaultCommand(shooter, shootTrigger);
-    //scheduler.registerSubsystem(driveTrain);
+    driveSelected = driveChooser.getSelected();
+    
+    if (driveSelected == "Arcade") {
+      configureDriverButtonBindings(driveSelected);
+      scheduler.setDefaultCommand(driveTrain, joystickDrive);
+    } else if(driveSelected == "Curve") {
+      configureDriverButtonBindings(driveSelected);
+      scheduler.setDefaultCommand(driveTrain, curvatureDrive);
+    }
   }
-
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
