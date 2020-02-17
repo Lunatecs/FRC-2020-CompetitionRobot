@@ -36,8 +36,8 @@ public final class Constants {
 
     public static final class IntakeConstants {
         public static final int Rollers_ID = 6;
-        public static final int Intake_Forward_ID = 3;
-        public static final int Intake_Backward_ID = 4;
+        public static final int Intake_Forward_ID = 0;
+        public static final int Intake_Backward_ID = 7;
     }
 
     public static final class FeederConstants {
