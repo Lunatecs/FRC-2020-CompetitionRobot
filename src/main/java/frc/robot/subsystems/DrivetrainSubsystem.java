@@ -14,6 +14,10 @@ import com.ctre.phoenix.sensors.PigeonIMU;
 
 import static frc.robot.Constants.DrivetrainConstants;
 
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -32,6 +36,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
   private WPI_TalonSRX colorWheel = new WPI_TalonSRX(ColorWheelConstants.ColorWheel_ID);
   private PigeonIMU gyro = new PigeonIMU(colorWheel);
   private DifferentialDrive drive;
+  private DifferentialDriveOdometry driveOdometry;
   /**
    * Creates a new DrivetrainSubsystem.
    */
@@ -51,8 +56,21 @@ public class DrivetrainSubsystem extends SubsystemBase {
     leftBack.follow(leftFront);
     rightBack.follow(rightFront);
 
-    drive = new DifferentialDrive(leftFront, rightFront);
-    
+    this.drive = new DifferentialDrive(leftFront, rightFront);
+    driveOdometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(getAngle()));
+  }
+
+  @Override
+  public void periodic() {
+    SmartDashboard.putNumber("R Encoder", this.getRightEncoderValue());
+    SmartDashboard.putNumber("L Encoder", this.getLeftEncoderValue());
+    SmartDashboard.putNumber("R Encoder Distance", this.getRightEncoderDistance());
+    SmartDashboard.putNumber("L Encoder Distance", this.getLeftEncoderDistance());
+    SmartDashboard.putNumber("Gyro Angle", this.getAngle());
+    SmartDashboard.putNumber("Gyro Rate", this.getTurnRate());
+
+    driveOdometry.update(Rotation2d.fromDegrees(getAngle()), getLeftEncoderDistance(), getRightEncoderDistance());
+    // This method will be called once per scheduler run
   }
 
   public void arcadeDrive(double speed, double rotation) {
@@ -61,6 +79,14 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
   public void curvatureDrive(double speed, double rotation, boolean isQuickTurn) {
     drive.curvatureDrive(speed, rotation, isQuickTurn);
+  }
+
+  public double getLeftEncoderDistanceRate() {
+    return (leftFront.getSelectedSensorVelocity(0)* DrivetrainConstants.DistancePerPulse) * 10;
+  }
+
+  public double getRightEncoderDistanceRate() {
+    return (rightFront.getSelectedSensorVelocity(0) * DrivetrainConstants.DistancePerPulse) * 10;
   }
 
   public double getLeftEncoderDistance() {
@@ -124,14 +150,16 @@ public class DrivetrainSubsystem extends SubsystemBase {
     drive.setMaxOutput(output);
   }
 
-  @Override
-  public void periodic() {
-    SmartDashboard.putNumber("R Encoder", this.getRightEncoderValue());
-    SmartDashboard.putNumber("L Encoder", this.getLeftEncoderValue());
-    SmartDashboard.putNumber("R Encoder Distance", this.getRightEncoderDistance());
-    SmartDashboard.putNumber("L Encoder Distance", this.getLeftEncoderDistance());
-    SmartDashboard.putNumber("Gyro Angle", this.getAngle());
-    SmartDashboard.putNumber("Gyro Rate", this.getTurnRate());
-    // This method will be called once per scheduler run
+  public Pose2d getPose() {
+    return driveOdometry.getPoseMeters();
+  }
+
+  public DifferentialDriveWheelSpeeds gWheelSpeeds() {
+    return new DifferentialDriveWheelSpeeds(getLeftEncoderDistanceRate(), getRightEncoderDistance())
+  }
+
+  public void resetOdometry(Pose2d pose) {
+    resetEncoders();
+    driveOdometry.resetPosition(pose, Rotation2d.fromDegrees(getAngle()));
   }
 }
