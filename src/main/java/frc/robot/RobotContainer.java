@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.buttons.JoystickAxisButton;
 import frc.robot.commands.CurvatureWithJoysticksCommand;
+import frc.robot.commands.DoNothingAutoCommand;
 import frc.robot.commands.DriveWithJoysticksCommand;
 import frc.robot.commands.ShootWithTriggerCommand;
 import frc.robot.subsystems.DrivetrainSubsystem;
@@ -59,8 +60,11 @@ public class RobotContainer {
                                                                         }, 
                                                                         () -> { return driverJoystick.getRawButton(ControllerConstants.Blue_Button_ID);});
   private final ShootWithTriggerCommand shootTrigger = new ShootWithTriggerCommand(shooter, () -> { return operatorJoystick.getRawAxis(ControllerConstants.Right_Trigger_ID);});
+  private final DoNothingAutoCommand doNothing = new DoNothingAutoCommand();
+  
   private String driveSelected;
   private final SendableChooser<String> driveChooser = new SendableChooser<>();
+  private final SendableChooser<String> autoChooser = new SendableChooser<>();
 
   /**
    * The container for the robot.  Contains subsystems, OI devices, and commands.
@@ -70,6 +74,10 @@ public class RobotContainer {
     driveChooser.setDefaultOption("Arcade", "Arcade");
     driveChooser.addOption("Curve", "Curve");
     SmartDashboard.putData("Drive choices", driveChooser);
+
+    autoChooser.setDefaultOption("Do Nothing", "doNothing");
+    SmartDashboard.putData("Auto choises", autoChooser);
+    //autoChooser.setDefaultOption("Pathfind-1", object);
     // Configure the button bindings
     configureButtonBindings();
     configureDefaultCommands();
@@ -169,8 +177,12 @@ public class RobotContainer {
    *
    * @return the command to run in autonomous
    */
-  // public Command getAutonomousCommand() {
-  //   // An ExampleCommand will run in autonomous
-  //   return m_autoCommand;
-  // }
+  public Command getAutonomousCommand() {
+    // An ExampleCommand will run in autonomous
+    if(autoChooser.getSelected() == "doNothing") {
+      return doNothing;
+    } else {
+      return doNothing;
+    }
+  }
 }
