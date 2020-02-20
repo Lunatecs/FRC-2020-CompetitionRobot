@@ -21,22 +21,26 @@ public class TurretSubsystem extends SubsystemBase {
 
   private final TalonSRX turret = new TalonSRX(TurretConstants.Turret_ID);
   private NeutralMode TURRET_NEUTRALMODE = NeutralMode.Brake;
-  private PIDController pidController;
+  private PIDController pidControllerFwd;
+  private PIDController pidControllerBck;
   /**
    * Creates a new TurretSubsystem.
    */
   public TurretSubsystem() {
     turret.configFactoryDefault();
     turret.setNeutralMode(TURRET_NEUTRALMODE);
-    resetPostion();
-    pidController = new PIDController(.001,0,0);
-    pidController.setSetpoint(10000);
+    resetPosition();
+    pidControllerFwd = new PIDController(TurretConstants.Kp,TurretConstants.Ki,TurretConstants.Kd);
+    pidControllerFwd.setSetpoint(TurretConstants.MaxSensorPostion);
+    pidControllerBck = new PIDController(TurretConstants.Kp,TurretConstants.Ki,TurretConstants.Kd);
+    pidControllerBck.setSetpoint(-TurretConstants.MaxSensorPostion);
+    turret.setSensorPhase(true);
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    SmartDashboard.putNumber("Turret Encoder", getPostion());
+    SmartDashboard.putNumber("Turret Encoder", getPosition());
   }
 
   /**
@@ -44,15 +48,26 @@ public class TurretSubsystem extends SubsystemBase {
    * @param speed
    */
   public void setTurretSpeed(double speed) {
-    pidController.calculate(this.getPostion());
+    int position = getPosition();
+    double speedLimitFwd = pidControllerFwd.calculate(position);
+    double speedLimitBck = pidControllerBck.calculate(position);
+    SmartDashboard.putNumber("speedLimitFwd", speedLimitFwd);
+    SmartDashboard.putNumber("speedLimitBck", speedLimitBck);
+    
+    if(speed > speedLimitFwd && speed > 0) {
+      speed = speedLimitFwd;
+    } else if(speed < speedLimitBck && speed <= 0) {
+      speed = speedLimitBck;
+    }
+    SmartDashboard.putNumber("actualSpeed", speed);
     turret.set(ControlMode.PercentOutput, speed);
   }
 
-  public int getPostion() {
+  public int getPosition() {
     return this.turret.getSelectedSensorPosition(0);
   }
 
-  public void resetPostion() {
+  public void resetPosition() {
     turret.setSelectedSensorPosition(0, 0, 10);
   }
 }

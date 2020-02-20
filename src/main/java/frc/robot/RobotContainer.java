@@ -145,7 +145,7 @@ public class RobotContainer {
     //scheduler.setDefaultCommand(driveTrain, joystickDrive);
     //scheduler.setDefaultCommand(shooter, shootTrigger);
     //scheduler.registerSubsystem(driveTrain);
-    scheduler.setDefaultCommand(shooter, new ManualTurretCommand(() -> this.operatorJoystick.getRawAxis(ControllerConstants.Joystick_Left_X_Axis), turret));
+    scheduler.setDefaultCommand(turret, new ManualTurretCommand(() -> this.operatorJoystick.getRawAxis(ControllerConstants.Joystick_Left_X_Axis), turret));
   }
 
   public void configureDriverButtonBindings(String drive) {
