@@ -21,6 +21,7 @@ import frc.robot.buttons.JoystickAxisButton;
 import frc.robot.commands.CurvatureWithJoysticksCommand;
 import frc.robot.commands.DoNothingAutoCommand;
 import frc.robot.commands.DriveWithJoysticksCommand;
+import frc.robot.commands.ManualTurretCommand;
 import frc.robot.commands.ShootWithTriggerCommand;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -118,10 +119,11 @@ public class RobotContainer {
   //----------------------------
 
   private void configureDefaultCommands() {
-    //CommandScheduler scheduler = CommandScheduler.getInstance();
+    CommandScheduler scheduler = CommandScheduler.getInstance();
     //scheduler.setDefaultCommand(driveTrain, joystickDrive);
     //scheduler.setDefaultCommand(shooter, shootTrigger);
     //scheduler.registerSubsystem(driveTrain);
+    scheduler.setDefaultCommand(shooter, new ManualTurretCommand(() -> this.operatorJoystick.getRawAxis(ControllerConstants.Joystick_Left_X_Axis), shooter));
   }
 
   public void configureDriverButtonBindings(String drive) {
