@@ -38,7 +38,7 @@ public class ManualTurretCommand extends CommandBase {
     double turretSpeed = speed.getAsDouble();
     SmartDashboard.putNumber("TurretSpeed", turretSpeed);
     if(Math.abs(turretSpeed) > .2) {
-      this.shooterSubsystem.setTurretSpeed(speed.getAsDouble()*.5);
+      this.shooterSubsystem.setTurretSpeed(speed.getAsDouble());
     } else {
       this.shooterSubsystem.setTurretSpeed(0);
     }
