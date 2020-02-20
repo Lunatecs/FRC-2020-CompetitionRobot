@@ -42,6 +42,7 @@ import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TowerSubsystem;
+import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.FeederSubsystem;
 
 /**
@@ -60,6 +61,7 @@ public class RobotContainer {
   private final ShooterSubsystem shooter = new ShooterSubsystem();
   private final TowerSubsystem tower = new TowerSubsystem();
   private final FeederSubsystem feeder = new FeederSubsystem();
+  private final TurretSubsystem turret = new TurretSubsystem();
 
   private final ShootWithTriggerCommand shootTrigger = new ShootWithTriggerCommand(shooter, () -> { return operatorJoystick.getRawAxis(ControllerConstants.Right_Trigger_ID);});
 
@@ -143,7 +145,7 @@ public class RobotContainer {
     //scheduler.setDefaultCommand(driveTrain, joystickDrive);
     //scheduler.setDefaultCommand(shooter, shootTrigger);
     //scheduler.registerSubsystem(driveTrain);
-    scheduler.setDefaultCommand(shooter, new ManualTurretCommand(() -> this.operatorJoystick.getRawAxis(ControllerConstants.Joystick_Left_X_Axis), shooter));
+    scheduler.setDefaultCommand(shooter, new ManualTurretCommand(() -> this.operatorJoystick.getRawAxis(ControllerConstants.Joystick_Left_X_Axis), turret));
   }
 
   public void configureDriverButtonBindings(String drive) {
