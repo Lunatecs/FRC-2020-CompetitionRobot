@@ -20,21 +20,16 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ShooterSubsystem extends SubsystemBase {
 
-  private final WPI_TalonSRX turret = new WPI_TalonSRX(ShooterConstants.Turret_ID);
   private final CANSparkMax leftFlywheel = new CANSparkMax(ShooterConstants.Flywheel_Left_ID, MotorType.kBrushless);
   private final CANSparkMax rightFlywheel = new CANSparkMax(ShooterConstants.Flywheel_Right_ID, MotorType.kBrushless);
   private final DoubleSolenoid hood = new DoubleSolenoid(ShooterConstants.Hood_Forward_ID, ShooterConstants.Hood_Reverse_ID);
 
   private boolean isLowered = true;
 
-  private NeutralMode TURRET_NEUTRALMODE = NeutralMode.Brake;
-
   /**
    * Creates a new ShooterSubsystem.
    */
   public ShooterSubsystem() {
-    turret.configFactoryDefault();
-    turret.setNeutralMode(TURRET_NEUTRALMODE);
 
     leftFlywheel.restoreFactoryDefaults();
     leftFlywheel.setIdleMode(IdleMode.kCoast);
@@ -49,14 +44,6 @@ public class ShooterSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-  }
-
-  /**
-   * Sets the speed of the turret.
-   * @param speed
-   */
-  public void setTurretSpeed(double speed) {
-    turret.set(ControlMode.PercentOutput, speed);
   }
 
   /**
