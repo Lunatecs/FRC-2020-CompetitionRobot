@@ -7,16 +7,31 @@
 
 package frc.robot;
 
+import java.io.IOException;
+import java.nio.file.Path;
+
+import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
+import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.controller.RamseteController;
+import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 
+import frc.robot.Constants.CharacterizationConstants;
 import frc.robot.Constants.ControllerConstants;
+import frc.robot.Constants.PathFollowingConstants;
+import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.buttons.JoystickAxisButton;
 import frc.robot.commands.CurvatureWithJoysticksCommand;
 import frc.robot.commands.DoNothingAutoCommand;
@@ -45,42 +60,47 @@ public class RobotContainer {
   private final TowerSubsystem tower = new TowerSubsystem();
   private final FeederSubsystem feeder = new FeederSubsystem();
 
-  private final DriveWithJoysticksCommand joystickDrive = new DriveWithJoysticksCommand(driveTrain, 
-                                                                        () -> { return -driverJoystick.getRawAxis(ControllerConstants.Joystick_Left_Y_Axis);}, 
-                                                                     () -> { return driverJoystick.getRawAxis(ControllerConstants.Joystick_Right_X_Axis);});
-  private final CurvatureWithJoysticksCommand curvatureDrive = new CurvatureWithJoysticksCommand(driveTrain,
-                                                                        () -> { return -driverJoystick.getRawAxis(ControllerConstants.Left_Trigger_ID) + driverJoystick.getRawAxis(ControllerConstants.Right_Trigger_ID);},
-                                                                        () -> 
-                                                                        { 
-                                                                          if ((Math.abs(driverJoystick.getRawAxis(ControllerConstants.Joystick_Left_X_Axis)) >= Math.abs((driverJoystick.getRawAxis(ControllerConstants.Joystick_Right_X_Axis))))) {
-                                                                            return driverJoystick.getRawAxis(ControllerConstants.Joystick_Left_X_Axis);
-                                                                          } else {
-                                                                            return driverJoystick.getRawAxis(ControllerConstants.Joystick_Right_X_Axis);
-                                                                          }
-                                                                        }, 
-                                                                        () -> { return driverJoystick.getRawButton(ControllerConstants.Blue_Button_ID);});
   private final ShootWithTriggerCommand shootTrigger = new ShootWithTriggerCommand(shooter, () -> { return operatorJoystick.getRawAxis(ControllerConstants.Right_Trigger_ID);});
-  private final DoNothingAutoCommand doNothing = new DoNothingAutoCommand();
-  
+
   private String driveSelected;
   private final SendableChooser<String> driveChooser = new SendableChooser<>();
-  private final SendableChooser<String> autoChooser = new SendableChooser<>();
+  private final SendableChooser<Command> autoChooser = new SendableChooser<>();
 
   /**
    * The container for the robot.  Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
-
-    driveChooser.setDefaultOption("Arcade", "Arcade");
-    driveChooser.addOption("Curve", "Curve");
-    SmartDashboard.putData("Drive choices", driveChooser);
-
-    autoChooser.setDefaultOption("Do Nothing", "doNothing");
-    SmartDashboard.putData("Auto choises", autoChooser);
     //autoChooser.setDefaultOption("Pathfind-1", object);
     // Configure the button bindings
-    configureButtonBindings();
     configureDefaultCommands();
+  }
+
+  public void configureAutos() {
+    final DoNothingAutoCommand doNothing = new DoNothingAutoCommand();
+
+    try {
+      Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(PathFollowingConstants.pathfinding1JSON);
+      Trajectory trajectoryPathweaver = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
+      final RamseteCommand pathfollow1 = new RamseteCommand(
+        trajectoryPathweaver,
+        driveTrain::getPose,
+        new RamseteController(PathFollowingConstants.RamseteB, PathFollowingConstants.RamseteZeta),
+        new SimpleMotorFeedforward(CharacterizationConstants.ksVolts,
+                                   CharacterizationConstants.kvVoltSecondsPerMeter,
+                                   CharacterizationConstants.kaVoltsSecondsSquaredPerMeter),
+        CharacterizationConstants.DriveKinematics,
+        driveTrain::getWheelSpeeds,
+        new PIDController(CharacterizationConstants.kPDriveVel, 0, 0),
+        new PIDController(CharacterizationConstants.kPDriveVel, 0, 0),
+        driveTrain::tankDriveVolts,
+        driveTrain);
+      autoChooser.addOption("Pathfollow1", pathfollow1);
+    } catch (IOException e) {
+      DriverStation.reportError("Unable to access trajectory: " + PathFollowingConstants.pathfinding1JSON, e.getStackTrace());
+    }
+    
+    autoChooser.setDefaultOption("Do Nothing", doNothing);
+    SmartDashboard.putData("Auto choises", autoChooser);
   }
 
   /**
@@ -89,7 +109,7 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a
    * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
-  private void configureButtonBindings() {
+  private void configureOperatorButtonBindings() {
 
     //--------Operator Binds--------
     new JoystickButton(operatorJoystick, ControllerConstants.Green_Button_ID).whenPressed(() -> driveTrain.zeroAngle());
@@ -160,14 +180,36 @@ public class RobotContainer {
   }
   
   public void configureDriveDefault() {
+    final DriveWithJoysticksCommand joystickDrive = new DriveWithJoysticksCommand(driveTrain, 
+                                                                        () -> { return -driverJoystick.getRawAxis(ControllerConstants.Joystick_Left_Y_Axis);}, 
+                                                                     () -> { return driverJoystick.getRawAxis(ControllerConstants.Joystick_Right_X_Axis);});
+    final CurvatureWithJoysticksCommand curvatureDrive = new CurvatureWithJoysticksCommand(driveTrain,
+                                                                        () -> { return -driverJoystick.getRawAxis(ControllerConstants.Left_Trigger_ID) + driverJoystick.getRawAxis(ControllerConstants.Right_Trigger_ID);},
+                                                                        () -> 
+                                                                        { 
+                                                                          if ((Math.abs(driverJoystick.getRawAxis(ControllerConstants.Joystick_Left_X_Axis)) >= Math.abs((driverJoystick.getRawAxis(ControllerConstants.Joystick_Right_X_Axis))))) {
+                                                                            return driverJoystick.getRawAxis(ControllerConstants.Joystick_Left_X_Axis);
+                                                                          } else {
+                                                                            return driverJoystick.getRawAxis(ControllerConstants.Joystick_Right_X_Axis);
+                                                                          }
+                                                                        }, 
+                                                                        () -> { return driverJoystick.getRawButton(ControllerConstants.Blue_Button_ID);});
+
+    
+    driveChooser.setDefaultOption("Arcade", "Arcade");
+    driveChooser.addOption("Curve", "Curve");
+    SmartDashboard.putData("Drive choices", driveChooser);
+
     CommandScheduler scheduler = CommandScheduler.getInstance();
     driveSelected = driveChooser.getSelected();
     
     if (driveSelected == "Arcade") {
       configureDriverButtonBindings(driveSelected);
+      configureOperatorButtonBindings();
       scheduler.setDefaultCommand(driveTrain, joystickDrive);
     } else if(driveSelected == "Curve") {
       configureDriverButtonBindings(driveSelected);
+      configureOperatorButtonBindings();
       scheduler.setDefaultCommand(driveTrain, curvatureDrive);
     }
   }
@@ -179,10 +221,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
-    if(autoChooser.getSelected() == "doNothing") {
-      return doNothing;
-    } else {
-      return doNothing;
-    }
+    return autoChooser.getSelected();
   }
 }
