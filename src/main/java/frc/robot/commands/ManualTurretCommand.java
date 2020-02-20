@@ -11,19 +11,19 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.TurretSubsystem;
 
 public class ManualTurretCommand extends CommandBase {
   
   private DoubleSupplier speed;
-  private ShooterSubsystem shooterSubsystem;
+  private TurretSubsystem turretSubsystem;
   
   /**
    * Creates a new ManualTurretCommand.
    */
-  public ManualTurretCommand(DoubleSupplier speed, ShooterSubsystem shooterSubsystem) {
-    this.shooterSubsystem = shooterSubsystem;
-    addRequirements(shooterSubsystem);
+  public ManualTurretCommand(DoubleSupplier speed, TurretSubsystem turretSubsystem) {
+    this.turretSubsystem = turretSubsystem;
+    addRequirements(turretSubsystem);
     this.speed = speed;
   }
 
@@ -38,9 +38,9 @@ public class ManualTurretCommand extends CommandBase {
     double turretSpeed = speed.getAsDouble();
     SmartDashboard.putNumber("TurretSpeed", turretSpeed);
     if(Math.abs(turretSpeed) > .2) {
-      this.shooterSubsystem.setTurretSpeed(speed.getAsDouble());
+      this.turretSubsystem.setTurretSpeed(speed.getAsDouble());
     } else {
-      this.shooterSubsystem.setTurretSpeed(0);
+      this.turretSubsystem.setTurretSpeed(0);
     }
   }
 
