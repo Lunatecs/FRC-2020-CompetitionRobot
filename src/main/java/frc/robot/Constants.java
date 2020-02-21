@@ -76,10 +76,16 @@ public final class Constants {
 
     public static final class TurretConstants {
         public static final int Turret_ID = 16;
-        public static final int MaxSensorPostion = 11000;
-        public static final double Kp = 0.00015;
-        public static final double Kd = 0.0;
-        public static final double Ki = 0.0;
+
+        public static final int FwdMaxSensorPostion = 11000;
+        public static final double FwdKp = 0.00015;
+        public static final double FwdKd = 0.0;
+        public static final double FwdKi = 0.0;
+        
+        public static final int BckMaxSensorPostion = -11000;
+        public static final double BckKp = 0.00015;
+        public static final double BckKd = 0.0;
+        public static final double BckKi = 0.0;
     }
 
     public static final class ShooterConstants {
