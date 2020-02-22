@@ -70,4 +70,12 @@ public class TurretSubsystem extends SubsystemBase {
   public void resetPosition() {
     turret.setSelectedSensorPosition(0, 0, 10);
   }
+
+  public boolean isFwdLimit() {
+    return false;
+  }
+
+  public boolean isRevLimit() {
+   return false;
+  }
 }
