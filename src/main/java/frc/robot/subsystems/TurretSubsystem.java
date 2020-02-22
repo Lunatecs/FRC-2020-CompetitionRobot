@@ -75,10 +75,18 @@ public class TurretSubsystem extends SubsystemBase {
   }
 
   public boolean isFwdLimit() {
-    return false;
+    if(getPosition() >= TurretConstants.FwdMaxSensorPostion) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   public boolean isRevLimit() {
-   return false;
+    if(getPosition() <= TurretConstants.BckMaxSensorPostion) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }
