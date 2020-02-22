@@ -30,10 +30,10 @@ public class TurretSubsystem extends SubsystemBase {
     turret.configFactoryDefault();
     turret.setNeutralMode(TURRET_NEUTRALMODE);
     resetPosition();
-    pidControllerFwd = new PIDController(TurretConstants.Kp,TurretConstants.Ki,TurretConstants.Kd);
-    pidControllerFwd.setSetpoint(TurretConstants.MaxSensorPostion);
-    pidControllerBck = new PIDController(TurretConstants.Kp,TurretConstants.Ki,TurretConstants.Kd);
-    pidControllerBck.setSetpoint(-TurretConstants.MaxSensorPostion);
+    pidControllerFwd = new PIDController(TurretConstants.FwdKp,TurretConstants.FwdKi,TurretConstants.FwdKd);
+    pidControllerFwd.setSetpoint(TurretConstants.FwdMaxSensorPostion);
+    pidControllerBck = new PIDController(TurretConstants.BckKp,TurretConstants.BckKi,TurretConstants.BckKd);
+    pidControllerBck.setSetpoint(TurretConstants.BckMaxSensorPostion);
     turret.setSensorPhase(true);
   }
 
@@ -44,11 +44,14 @@ public class TurretSubsystem extends SubsystemBase {
   }
 
   /**
-   * Sets the speed of the turret.
+   * Sets the speed of the turret. Uses two built in PID Controllers
+   * to limit max speed when approaching edges of the turret. One for
+   * the left and right o the turret. This helps protect the wiring of
+   * the turret.
    * @param speed
    */
   public void setTurretSpeed(double speed) {
-    int position = getPosition();
+    int position = getPosition(); 
     double speedLimitFwd = pidControllerFwd.calculate(position);
     double speedLimitBck = pidControllerBck.calculate(position);
     SmartDashboard.putNumber("speedLimitFwd", speedLimitFwd);
