@@ -62,6 +62,13 @@ public class TurretSubsystem extends SubsystemBase {
     } else if(speed < speedLimitBck && speed <= 0) {
       speed = speedLimitBck;
     }
+    if (!(speed == 0) && Math.abs(speed) < TurretConstants.MinSpeed) {
+      if(speed < 0) {
+        speed = -TurretConstants.MinSpeed;
+      } else if(speed > 0) {
+        speed = TurretConstants.MinSpeed;
+      }
+    }
     SmartDashboard.putNumber("actualSpeed", speed);
     turret.set(ControlMode.PercentOutput, speed);
   }
@@ -72,5 +79,23 @@ public class TurretSubsystem extends SubsystemBase {
 
   public void resetPosition() {
     turret.setSelectedSensorPosition(0, 0, 10);
+  }
+
+  public boolean isFwdLimit() {
+    return turret.getSensorCollection().isFwdLimitSwitchClosed();
+    // if(getPosition() >= TurretConstants.FwdMaxSensorPostion) {
+    //   return true;
+    // } else {
+    //   return false;
+    // }
+  }
+
+  public boolean isRevLimit() {
+    return turret.getSensorCollection().isRevLimitSwitchClosed();
+    // if(getPosition() <= TurretConstants.BckMaxSensorPostion) {
+    //   return true;
+    // } else {
+    //   return false;
+    // }
   }
 }

@@ -34,12 +34,14 @@ import frc.robot.Constants.PathFollowingConstants;
 import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.buttons.JoystickAxisButton;
 import frc.robot.commands.CurvatureWithJoysticksCommand;
+import frc.robot.commands.DefaultTurretCommand;
 import frc.robot.commands.DoNothingAutoCommand;
 import frc.robot.commands.DriveWithJoysticksCommand;
 import frc.robot.commands.ManualTurretCommand;
 import frc.robot.commands.ShootWithTriggerCommand;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.LimelightSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TowerSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
@@ -62,8 +64,10 @@ public class RobotContainer {
   private final TowerSubsystem tower = new TowerSubsystem();
   private final FeederSubsystem feeder = new FeederSubsystem();
   private final TurretSubsystem turret = new TurretSubsystem();
+  private final LimelightSubsystem limelight = new LimelightSubsystem();
 
   private final ShootWithTriggerCommand shootTrigger = new ShootWithTriggerCommand(shooter, () -> { return operatorJoystick.getRawAxis(ControllerConstants.Right_Trigger_ID);});
+  private final DefaultTurretCommand defaultTurret = new DefaultTurretCommand(turret, limelight);
 
   private String driveSelected;
   private final SendableChooser<String> driveChooser = new SendableChooser<>();
@@ -141,7 +145,8 @@ public class RobotContainer {
     //scheduler.setDefaultCommand(driveTrain, joystickDrive);
     //scheduler.setDefaultCommand(shooter, shootTrigger);
     //scheduler.registerSubsystem(driveTrain);
-    scheduler.setDefaultCommand(turret, new ManualTurretCommand(() -> this.operatorJoystick.getRawAxis(ControllerConstants.Joystick_Left_X_Axis), turret));
+    //scheduler.setDefaultCommand(turret, new ManualTurretCommand(() -> this.operatorJoystick.getRawAxis(ControllerConstants.Joystick_Left_X_Axis), turret));
+    scheduler.setDefaultCommand(turret, defaultTurret);
   }
 
   public void configureDriverButtonBindings(String drive) {
