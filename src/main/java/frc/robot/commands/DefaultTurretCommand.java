@@ -8,6 +8,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.TurretConstants;
 import frc.robot.subsystems.LimelightSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import edu.wpi.first.wpilibj.controller.PIDController;
@@ -17,10 +18,11 @@ public class DefaultTurretCommand extends CommandBase {
   /**
    * Creates a new DefaultTurretCommand.
    */
-  double defaultP = 0.0;
+  double defaultP = 0.04;
   double defaultI = 0.0;
+  //double defaultD = 0.002;
   double defaultD = 0.0;
-  double minSpeed = .1;
+  double scanSpeed = 0.25;
 
   TurretSubsystem turret;
   LimelightSubsystem limelight;
@@ -45,21 +47,22 @@ public class DefaultTurretCommand extends CommandBase {
   @Override
   public void execute() {
     double speed = 0.0;
+    SmartDashboard.putBoolean("IsValidTarget", limelight.isValidTarget());
     if(limelight.isValidTarget()) {
       speed = pController.calculate(limelight.getTX(), 0);
-      if(Math.abs(speed) < minSpeed) {
-        if(speed<=0) {
-          speed = -minSpeed;
-        } else {
-          speed = minSpeed;
-        }
-      }
+      turret.setTurretSpeed(speed);
     } else {
-
+      // if(turret.isFwdLimit()) {
+      //   scanSpeed = -.25;
+      // } else if(turret.isRevLimit()) {
+      //   scanSpeed = .25;
+      // }
+      // turret.setTurretSpeed(scanSpeed);
     }
-    turret.setTurretSpeed(speed);
     SmartDashboard.putBoolean("Fwd", turret.isFwdLimit());
     SmartDashboard.putBoolean("Rev", turret.isRevLimit());
+    SmartDashboard.putNumber("Tx", limelight.getTX());
+    SmartDashboard.putNumber("speed", speed);
   }
 
   // Called once the command ends or is interrupted.
