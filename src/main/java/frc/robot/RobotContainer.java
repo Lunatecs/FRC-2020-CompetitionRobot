@@ -114,7 +114,6 @@ public class RobotContainer {
    */
   private void configureOperatorButtonBindings() {
 
-    //--------Operator Binds--------
     new JoystickButton(operatorJoystick, ControllerConstants.Green_Button_ID).whenPressed(() -> driveTrain.zeroAngle());
 
     new JoystickButton(operatorJoystick, ControllerConstants.Right_Bumper_ID)
@@ -126,19 +125,16 @@ public class RobotContainer {
                                                                                         tower.setConveyorSpeed(1);})
                                                                     .whenReleased(() -> {feeder.setFeederSpeed(0);
                                                                                         tower.setConveyorSpeed(0);});
-    //------------------------------
-   
-    // new JoystickAxisButton(driverJoystick, ControllerConstants.Right_Trigger_ID)
-    //                                                                 .whenPressed(() -> driveTrain.setMaxOutput(0.5))
-    //                                                                 .whenReleased(() -> driveTrain.setMaxOutput(1));
-
-    // new JoystickAxisButton(driverJoystick, ControllerConstants.Left_Trigger_ID)
-    //                                                                 .whenPressed(() -> driveTrain.setMaxOutput(0.25))
-    //                                                                 .whenReleased(() -> driveTrain.setMaxOutput(1));
-
-    //--------Drivers Binds--------
+    
+    new JoystickButton(operatorJoystick, ControllerConstants.Blue_Button_ID).whenPressed(() ->
+    { 
+      if (shooter.isLowered()) {
+        shooter.raiseHood();
+      } else {
+        shooter.lowerHood();
+      }
+    });
   }
-  //----------------------------
 
   private void configureDefaultCommands() {
     CommandScheduler scheduler = CommandScheduler.getInstance();
