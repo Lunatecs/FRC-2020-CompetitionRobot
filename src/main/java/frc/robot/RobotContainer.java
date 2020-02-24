@@ -9,14 +9,17 @@ package frc.robot;
 
 import java.io.IOException;
 import java.nio.file.Path;
-
+import edu.wpi.first.wpilibj2.command.button.POVButton;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpiutil.math.MathUtil;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.controller.PIDController;
@@ -26,19 +29,19 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
-import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 
 import frc.robot.Constants.CharacterizationConstants;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.PathFollowingConstants;
 import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.buttons.JoystickAxisButton;
+import frc.robot.commands.AdjustFlyWheelCommand;
 import frc.robot.commands.CurvatureWithJoysticksCommand;
-import frc.robot.commands.DefaultTurretCommand;
+import frc.robot.commands.ScanForTargetCommand;
 import frc.robot.commands.DoNothingAutoCommand;
 import frc.robot.commands.DriveWithJoysticksCommand;
 import frc.robot.commands.ManualTurretCommand;
-import frc.robot.commands.ShootWithTriggerCommand;
+import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.LimelightSubsystem;
@@ -65,9 +68,10 @@ public class RobotContainer {
   private final FeederSubsystem feeder = new FeederSubsystem();
   private final TurretSubsystem turret = new TurretSubsystem();
   private final LimelightSubsystem limelight = new LimelightSubsystem();
+  private final ClimberSubsystem climber = new ClimberSubsystem();
 
-  private final ShootWithTriggerCommand shootTrigger = new ShootWithTriggerCommand(shooter, () -> { return operatorJoystick.getRawAxis(ControllerConstants.Right_Trigger_ID);});
-  private final DefaultTurretCommand defaultTurret = new DefaultTurretCommand(turret, limelight);
+  private final ManualTurretCommand manualTurret = new ManualTurretCommand(() -> this.operatorJoystick.getRawAxis(ControllerConstants.Joystick_Left_X_Axis), turret);
+  private final ScanForTargetCommand scanForTarget = new ScanForTargetCommand(turret, limelight);
 
   private String driveSelected;
   private final SendableChooser<String> driveChooser = new SendableChooser<>();
@@ -120,9 +124,10 @@ public class RobotContainer {
 
     new JoystickButton(operatorJoystick, ControllerConstants.Green_Button_ID).whenPressed(() -> driveTrain.zeroAngle());
 
-    new JoystickButton(operatorJoystick, ControllerConstants.Right_Bumper_ID)
-                                                                     .whenPressed(() -> shooter.setFlyWheelSpeed(1))
-                                                                     .whenReleased(() -> shooter.setFlyWheelSpeed(0));
+    // new JoystickButton(operatorJoystick, ControllerConstants.Right_Bumper_ID)
+    //                                                                  .whenPressed(() -> shooter.setFlyWheelSpeed(.9))
+    //                                                                  .whenReleased(() -> shooter.setFlyWheelSpeed(0));
+
 
     new JoystickButton(operatorJoystick, ControllerConstants.Left_Bumper_ID)
                                                                     .whenPressed(() -> {feeder.setFeederSpeed(-1);
@@ -130,6 +135,12 @@ public class RobotContainer {
                                                                     .whenReleased(() -> {feeder.setFeederSpeed(0);
                                                                                         tower.setConveyorSpeed(0);});
     
+    new POVButton(operatorJoystick, 0).whileHeld(new AdjustFlyWheelCommand(shooter, 4500));
+//                                      .whenReleased(new InstantCommand(() -> shooter.setFlyWheelSpeed(0), shooter));
+
+    new POVButton(operatorJoystick, 180).whileHeld(new AdjustFlyWheelCommand(shooter, 5500));
+//                                      .whenReleased(new InstantCommand(() -> shooter.setFlyWheelSpeed(0), shooter));
+
     new JoystickButton(operatorJoystick, ControllerConstants.Blue_Button_ID).whenPressed(() ->
     { 
       if (shooter.isLowered()) {
@@ -138,25 +149,25 @@ public class RobotContainer {
         shooter.lowerHood();
       }
     });
+
+    new JoystickButton(operatorJoystick, ControllerConstants.Red_Button_ID).whileActiveContinuous(scanForTarget); 
+
   }
 
   private void configureDefaultCommands() {
     CommandScheduler scheduler = CommandScheduler.getInstance();
-    //scheduler.setDefaultCommand(driveTrain, joystickDrive);
-    //scheduler.setDefaultCommand(shooter, shootTrigger);
-    //scheduler.registerSubsystem(driveTrain);
-    //scheduler.setDefaultCommand(turret, new ManualTurretCommand(() -> this.operatorJoystick.getRawAxis(ControllerConstants.Joystick_Left_X_Axis), turret));
-    scheduler.setDefaultCommand(turret, defaultTurret);
+    scheduler.setDefaultCommand(turret, manualTurret);
+    scheduler.setDefaultCommand(climber, new RunCommand(() -> climber.setHighStage(MathUtil.clamp(this.operatorJoystick.getRawAxis(ControllerConstants.Joystick_Right_Y_Axis),-.25,.25)),this.climber));
   }
 
   public void configureDriverButtonBindings(String drive) {
     new JoystickButton(driverJoystick, ControllerConstants.Right_Bumper_ID)
                                                                           .whenPressed(() -> driveTrain.setMaxOutput(0.25))
-                                                                          .whenReleased(() -> driveTrain.setMaxOutput(1));
+                                                                          .whenReleased(() -> driveTrain.setMaxOutput(.85));
 
     new JoystickButton(driverJoystick, ControllerConstants.Left_Bumper_ID)
                                                                           .whenPressed(() -> driveTrain.setMaxOutput(.5))
-                                                                          .whenReleased(() -> driveTrain.setMaxOutput(1));
+                                                                          .whenReleased(() -> driveTrain.setMaxOutput(.85));
 
     new JoystickButton(driverJoystick, ControllerConstants.Yellow_Button_ID).whenPressed(() -> 
     { 
@@ -164,6 +175,15 @@ public class RobotContainer {
         intake.raiseIntake();
       } else {
         intake.lowerIntake();
+      }
+    });
+
+    new JoystickButton(driverJoystick, ControllerConstants.Green_Button_ID).whenPressed(() -> 
+    {
+      if (climber.isLowered()) {
+        climber.raiseLowStage();
+      } else {
+        climber.lowerLowStage();
       }
     });
 

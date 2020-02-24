@@ -16,6 +16,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import frc.robot.Constants.ShooterConstants;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ShooterSubsystem extends SubsystemBase {
@@ -32,17 +33,21 @@ public class ShooterSubsystem extends SubsystemBase {
   public ShooterSubsystem() {
 
     leftFlywheel.restoreFactoryDefaults();
-    leftFlywheel.setIdleMode(IdleMode.kCoast);
+    leftFlywheel.setIdleMode(IdleMode.kBrake);
     leftFlywheel.setInverted(true);
 
     rightFlywheel.restoreFactoryDefaults();
-    rightFlywheel.setIdleMode(IdleMode.kCoast);
+    rightFlywheel.setIdleMode(IdleMode.kBrake);
     
     this.isLowered = true;
   }
 
   @Override
   public void periodic() {
+    SmartDashboard.putNumber("Left Velocity", this.getLeftEncoderVelocity());
+    SmartDashboard.putNumber("Right Velocity", this.getRightEncoderVelocity());
+
+    SmartDashboard.putNumber("AVG Velocity", (this.getRightEncoderVelocity() + this.getRightEncoderVelocity())/2.0);
     // This method will be called once per scheduler run
   }
 
@@ -69,6 +74,19 @@ public class ShooterSubsystem extends SubsystemBase {
   public void raiseHood() {
     hood.set(DoubleSolenoid.Value.kReverse);
     this.isLowered = false;
+  }
+
+  public double getLeftEncoderVelocity() {
+    return leftFlywheel.getEncoder().getVelocity();
+  }
+
+
+  public double getRightEncoderVelocity() {
+    return rightFlywheel.getEncoder().getVelocity();
+  }
+
+  public double getAvgVelocity() {
+    return (this.getRightEncoderVelocity() + this.getRightEncoderVelocity())/2.0;
   }
 
   /**

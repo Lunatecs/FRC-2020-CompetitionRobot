@@ -58,6 +58,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
     this.drive = new DifferentialDrive(leftFront, rightFront);
     driveOdometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(getAngle()));
+    this.setMaxOutput(.85);
   }
 
   @Override

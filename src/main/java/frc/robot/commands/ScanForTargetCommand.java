@@ -8,28 +8,25 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.TrackingConstants;
 import frc.robot.Constants.TurretConstants;
 import frc.robot.subsystems.LimelightSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class DefaultTurretCommand extends CommandBase {
+public class ScanForTargetCommand extends CommandBase {
   /**
    * Creates a new DefaultTurretCommand.
    */
-  double defaultP = 0.04;
-  double defaultI = 0.0;
-  //double defaultD = 0.002;
-  double defaultD = 0.0;
-  double scanSpeed = 0.25;
+  double scanSpeed = 0.75;
 
   TurretSubsystem turret;
   LimelightSubsystem limelight;
 
-  PIDController pController = new PIDController(defaultP, defaultI, defaultD);
+  PIDController pController = new PIDController(TrackingConstants.kP, TrackingConstants.kI, TrackingConstants.kD);
 
-  public DefaultTurretCommand(TurretSubsystem turret, LimelightSubsystem limelight) {
+  public ScanForTargetCommand(TurretSubsystem turret, LimelightSubsystem limelight) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.turret = turret;
     this.limelight = limelight;
@@ -50,14 +47,14 @@ public class DefaultTurretCommand extends CommandBase {
     SmartDashboard.putBoolean("IsValidTarget", limelight.isValidTarget());
     if(limelight.isValidTarget()) {
       speed = pController.calculate(limelight.getTX(), 0);
-      turret.setTurretSpeed(speed);
+      turret.setTurretSpeed(speed, true);
     } else {
-      // if(turret.isFwdLimit()) {
-      //   scanSpeed = -.25;
-      // } else if(turret.isRevLimit()) {
-      //   scanSpeed = .25;
-      // }
-      // turret.setTurretSpeed(scanSpeed);
+      if(turret.isFwdLimit()) {
+        scanSpeed = -.75;
+      } else if(turret.isRevLimit()) {
+        scanSpeed = .75;
+      }
+      turret.setTurretSpeed(scanSpeed);
     }
     SmartDashboard.putBoolean("Fwd", turret.isFwdLimit());
     SmartDashboard.putBoolean("Rev", turret.isRevLimit());

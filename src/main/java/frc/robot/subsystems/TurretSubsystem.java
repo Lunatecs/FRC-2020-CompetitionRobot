@@ -50,7 +50,7 @@ public class TurretSubsystem extends SubsystemBase {
    * the turret.
    * @param speed
    */
-  public void setTurretSpeed(double speed) {
+  public void setTurretSpeed(double speed, boolean ignoreMin) {
     int position = getPosition(); 
     double speedLimitFwd = pidControllerFwd.calculate(position);
     double speedLimitBck = pidControllerBck.calculate(position);
@@ -62,7 +62,7 @@ public class TurretSubsystem extends SubsystemBase {
     } else if(speed < speedLimitBck && speed <= 0) {
       speed = speedLimitBck;
     }
-    if (!(speed == 0) && Math.abs(speed) < TurretConstants.MinSpeed) {
+    if (!(speed == 0) && Math.abs(speed) < TurretConstants.MinSpeed && !ignoreMin) {
       if(speed < 0) {
         speed = -TurretConstants.MinSpeed;
       } else if(speed > 0) {
@@ -71,6 +71,10 @@ public class TurretSubsystem extends SubsystemBase {
     }
     SmartDashboard.putNumber("actualSpeed", speed);
     turret.set(ControlMode.PercentOutput, speed);
+  }
+
+  public void setTurretSpeed(double speed) {
+    setTurretSpeed(speed, false);
   }
 
   public int getPosition() {
