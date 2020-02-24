@@ -74,13 +74,19 @@ public final class Constants {
         public static final int Conveyor_ID = 2;
     }
 
+    public static final class TrackingConstants {
+        public static final double kP = 0.03;
+        public static final double kI = 0.0;
+        public static final double kD = 0.0;
+    }
+
     public static final class TurretConstants {
         public static final int Turret_ID = 16;
 
         public static final double MinSpeed = 0.05;
         public static final double ScanSpeed = 0.25;
         
-        public static final int FwdMaxSensorPostion = 11000;
+        public static final int FwdMaxSensorPostion = 12000;
         public static final double FwdKp = 0.00015;
         public static final double FwdKd = 0.0;
         public static final double FwdKi = 0.0;
@@ -89,6 +95,12 @@ public final class Constants {
         public static final double BckKp = 0.00015;
         public static final double BckKd = 0.0;
         public static final double BckKi = 0.0;
+    }
+
+    public static final class ClimberConstants {
+        public static final int LowStage_Forward_ID = 2;
+        public static final int LowStage_Reverse_ID = 5;
+        public static final int HighStage_ID = 4;
     }
 
     public static final class ShooterConstants {
