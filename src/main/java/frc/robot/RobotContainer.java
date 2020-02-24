@@ -31,6 +31,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 
 import frc.robot.Constants.CharacterizationConstants;
+import frc.robot.Constants.ClimberConstants;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.PathFollowingConstants;
 import frc.robot.Constants.DrivetrainConstants;
@@ -157,7 +158,15 @@ public class RobotContainer {
   private void configureDefaultCommands() {
     CommandScheduler scheduler = CommandScheduler.getInstance();
     scheduler.setDefaultCommand(turret, manualTurret);
-    scheduler.setDefaultCommand(climber, new RunCommand(() -> climber.setHighStage(MathUtil.clamp(this.operatorJoystick.getRawAxis(ControllerConstants.Joystick_Right_Y_Axis),-.25,.25)),this.climber));
+    scheduler.setDefaultCommand(climber, new RunCommand(() -> 
+    { 
+      if(!climber.isHighStageRetracted()) {
+        climber.setHighStage(MathUtil.clamp(this.operatorJoystick.getRawAxis(ControllerConstants.Joystick_Right_Y_Axis),-ClimberConstants.HighStageMaxSpeed,ClimberConstants.HighStageMaxSpeed));  
+      } else {
+        climber.setHighStage(0.0);
+      }
+    },
+    this.climber));
   }
 
   public void configureDriverButtonBindings(String drive) {

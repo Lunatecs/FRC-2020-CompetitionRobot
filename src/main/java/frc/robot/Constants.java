@@ -101,6 +101,8 @@ public final class Constants {
         public static final int LowStage_Forward_ID = 2;
         public static final int LowStage_Reverse_ID = 5;
         public static final int HighStage_ID = 4;
+        public static final int HighStageClosedLimitSwitch = 0;
+        public static final double HighStageMaxSpeed = .25;
     }
 
     public static final class ShooterConstants {
