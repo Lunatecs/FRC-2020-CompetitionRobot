@@ -41,6 +41,7 @@ import frc.robot.commands.CurvatureWithJoysticksCommand;
 import frc.robot.commands.ScanForTargetCommand;
 import frc.robot.commands.DoNothingAutoCommand;
 import frc.robot.commands.DriveWithJoysticksCommand;
+import frc.robot.commands.FlyWheelCommand;
 import frc.robot.commands.ManualTurretCommand;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.DrivetrainSubsystem;
@@ -129,18 +130,24 @@ public class RobotContainer {
     //                                                                  .whenPressed(() -> shooter.setFlyWheelSpeed(.9))
     //                                                                  .whenReleased(() -> shooter.setFlyWheelSpeed(0));
 
-
     new JoystickButton(operatorJoystick, ControllerConstants.Left_Bumper_ID)
                                                                     .whenPressed(() -> {feeder.setFeederSpeed(-1);
                                                                                         tower.setConveyorSpeed(1);})
                                                                     .whenReleased(() -> {feeder.setFeederSpeed(0);
                                                                                         tower.setConveyorSpeed(0);});
     
-    new POVButton(operatorJoystick, 0).whileHeld(new AdjustFlyWheelCommand(shooter, 4500));
-//                                      .whenReleased(new InstantCommand(() -> shooter.setFlyWheelSpeed(0), shooter));
+    //Setpoint needs to be 1000 above what you want to hit. ie. 5500 is actualy aiming for 4500
+    new POVButton(operatorJoystick, 0).whileHeld(() -> {shooter.setSetpoint(4000); shooter.enable();})
+                                      .whenReleased(() -> shooter.disable());
+    new POVButton(operatorJoystick, 180).whileHeld(() -> {shooter.setSetpoint(5000); shooter.enable();})
+                                      .whenReleased(() -> shooter.disable());
+    // new POVButton(operatorJoystick, 0).whileHeld(new FlyWheelCommand(shooter, 4000));
+    // new POVButton(operatorJoystick, 180).whileHeld(new FlyWheelCommand(shooter, 5500));
+//     new POVButton(operatorJoystick, 0).whileHeld(new AdjustFlyWheelCommand(shooter, 4500));
+// //                                      .whenReleased(new InstantCommand(() -> shooter.setFlyWheelSpeed(0), shooter));
 
-    new POVButton(operatorJoystick, 180).whileHeld(new AdjustFlyWheelCommand(shooter, 5500));
-//                                      .whenReleased(new InstantCommand(() -> shooter.setFlyWheelSpeed(0), shooter));
+//     new POVButton(operatorJoystick, 180).whileHeld(new AdjustFlyWheelCommand(shooter, 5500));
+// //                                      .whenReleased(new InstantCommand(() -> shooter.setFlyWheelSpeed(0), shooter));
 
     new JoystickButton(operatorJoystick, ControllerConstants.Blue_Button_ID).whenPressed(() ->
     { 

@@ -16,10 +16,12 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import frc.robot.Constants.ShooterConstants;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.PIDSubsystem;
+import edu.wpi.first.wpilibj.controller.PIDController;
 
-public class ShooterSubsystem extends SubsystemBase {
+public class ShooterSubsystem extends PIDSubsystem {
 
   private final CANSparkMax leftFlywheel = new CANSparkMax(ShooterConstants.Flywheel_Left_ID, MotorType.kBrushless);
   private final CANSparkMax rightFlywheel = new CANSparkMax(ShooterConstants.Flywheel_Right_ID, MotorType.kBrushless);
@@ -31,24 +33,50 @@ public class ShooterSubsystem extends SubsystemBase {
    * Creates a new ShooterSubsystem.
    */
   public ShooterSubsystem() {
+    //0.0009,0 0.00009
+    super(new PIDController(0.0009, 0.0, 0.00009), 0);
 
     leftFlywheel.restoreFactoryDefaults();
-    leftFlywheel.setIdleMode(IdleMode.kBrake);
+    leftFlywheel.setIdleMode(IdleMode.kCoast);
     leftFlywheel.setInverted(true);
 
     rightFlywheel.restoreFactoryDefaults();
-    rightFlywheel.setIdleMode(IdleMode.kBrake);
-    
+    rightFlywheel.setIdleMode(IdleMode.kCoast);
+    this.getController().setTolerance(50);
     this.isLowered = true;
   }
 
   @Override
   public void periodic() {
+    super.periodic();
     SmartDashboard.putNumber("Left Velocity", this.getLeftEncoderVelocity());
     SmartDashboard.putNumber("Right Velocity", this.getRightEncoderVelocity());
 
     SmartDashboard.putNumber("AVG Velocity", (this.getRightEncoderVelocity() + this.getRightEncoderVelocity())/2.0);
     // This method will be called once per scheduler run
+  }
+
+  /**
+   * Gets the status of the PID controller stating wether
+   * we are at our specific setpoint.
+   * @return PID controller at set point w/ tolerence
+   */
+  public boolean atSetpoint() {
+    return this.getController().atSetpoint();
+  }
+
+  @Override
+  public double getMeasurement() {
+    return this.getAvgVelocity();
+  }
+
+  /**
+   * Uses the pid loop output and applys it to the motor
+   */
+  @Override
+  public void useOutput(double output, double setPoint) {
+    this.setFlyWheelSpeed(output);
+    SmartDashboard.putString("PID Output", output + ":" + this.getController().getSetpoint());
   }
 
   /**

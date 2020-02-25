@@ -52,6 +52,7 @@ public final class Constants {
         public static final double RamseteB = 2.0;
         public static final double RamseteZeta = 0.7;
 
+        //This is in /home/lvuser/deploy/paths on the ROBORIO
         public static final String pathfinding1JSON = "paths/test.wpilib.json";
     }
 
