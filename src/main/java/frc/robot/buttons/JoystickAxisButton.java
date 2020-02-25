@@ -24,6 +24,6 @@ public class JoystickAxisButton extends Button {
     
     @Override
     public boolean get() {
-        return joystick.getRawAxis(this.axis) > 0;
+        return joystick.getRawAxis(this.axis) > 0.2;
     }
 }
