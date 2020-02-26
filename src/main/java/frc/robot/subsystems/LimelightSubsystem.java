@@ -9,6 +9,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.cameraserver.CameraServer;
 
@@ -46,6 +47,10 @@ public class LimelightSubsystem extends SubsystemBase {
     }
   }
 
+  public boolean isOnTarget() {
+    return Math.abs(this.getTX()) <= 1;
+  }
+
   public void setCamMode(double value){
     table.getEntry("camMode").setDouble(value);
   }
@@ -60,6 +65,7 @@ public class LimelightSubsystem extends SubsystemBase {
   
   @Override
   public void periodic() {
+    SmartDashboard.putBoolean("isOnTarget", isOnTarget());
     // This method will be called once per scheduler run
   }
 }

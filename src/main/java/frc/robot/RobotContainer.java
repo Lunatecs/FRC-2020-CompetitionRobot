@@ -18,6 +18,9 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpiutil.math.MathUtil;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -51,6 +54,7 @@ import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TowerSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.FeederSubsystem;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -86,9 +90,24 @@ public class RobotContainer {
     //autoChooser.setDefaultOption("Pathfind-1", object);
     // Configure the button bindings
     configureDefaultCommands();
+    configureAutos();
   }
 
   public void configureAutos() {
+    SmartDashboard.putBoolean("IsHere", false);
+    final ParallelCommandGroup threeShootAndForward = new ParallelCommandGroup(
+      scanForTarget,  
+      new SequentialCommandGroup(
+        new InstantCommand(() -> {shooter.setSetpoint(3650); shooter.enable();}),
+        new WaitUntilCommand(shooter::atSetpoint),
+        new WaitUntilCommand(limelight::isOnTarget),
+        new InstantCommand(() -> {feeder.setFeederSpeed(-1); tower.setConveyorSpeed(1); SmartDashboard.putBoolean("IsHere", true);}),
+        new WaitCommand(2),
+        new InstantCommand(() -> {shooter.disable(); tower.setConveyorSpeed(0); feeder.setFeederSpeed(0);})
+      )
+    );
+
+    autoChooser.addOption("ThreeShootAndForward", threeShootAndForward);
     final DoNothingAutoCommand doNothing = new DoNothingAutoCommand();
 
     try {
@@ -137,7 +156,7 @@ public class RobotContainer {
                                                                                         tower.setConveyorSpeed(0);});
     
     //Setpoint needs to be 1000 above what you want to hit. ie. 5500 is actualy aiming for 4500
-    new POVButton(operatorJoystick, 0).whileHeld(() -> {shooter.setSetpoint(4000); shooter.enable();})
+    new POVButton(operatorJoystick, 0).whileHeld(() -> {shooter.setSetpoint(3650); shooter.enable();})
                                       .whenReleased(() -> shooter.disable());
     new POVButton(operatorJoystick, 180).whileHeld(() -> {shooter.setSetpoint(5000); shooter.enable();})
                                       .whenReleased(() -> shooter.disable());

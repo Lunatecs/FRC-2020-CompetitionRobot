@@ -51,7 +51,7 @@ public class ShooterSubsystem extends PIDSubsystem {
     super.periodic();
     SmartDashboard.putNumber("Left Velocity", this.getLeftEncoderVelocity());
     SmartDashboard.putNumber("Right Velocity", this.getRightEncoderVelocity());
-
+    SmartDashboard.putBoolean("AtSetpoint", this.atSetpoint());
     SmartDashboard.putNumber("AVG Velocity", (this.getRightEncoderVelocity() + this.getRightEncoderVelocity())/2.0);
     // This method will be called once per scheduler run
   }
@@ -62,7 +62,7 @@ public class ShooterSubsystem extends PIDSubsystem {
    * @return PID controller at set point w/ tolerence
    */
   public boolean atSetpoint() {
-    return this.getController().atSetpoint();
+    return this.getController().getSetpoint() - 1000 <= this.getAvgVelocity();
   }
 
   @Override
