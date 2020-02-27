@@ -57,22 +57,22 @@ public final class Constants {
     }
 
     public static final class ColorWheelConstants {
-        public static final int ColorWheel_ID = 3;
+        public static final int ColorWheel_ID = 1;
     }
 
     public static final class IntakeConstants {
-        public static final int Rollers_ID = 6;
+        public static final int Rollers_ID = 13;
         public static final int Intake_Forward_ID = 0;
         public static final int Intake_Backward_ID = 7;
     }
 
     public static final class FeederConstants {
-        public static final int Guiders_Left_ID = 5;
-        public static final int Guiders_Right_ID = 9;
+        public static final int Guiders_Left_ID = 14;
+        public static final int Guiders_Right_ID = 2;
     }
 
     public static final class TowerConstants {
-        public static final int Conveyor_ID = 2;
+        public static final int Conveyor_ID = 20;
     }
 
     public static final class TrackingConstants {
@@ -82,7 +82,7 @@ public final class Constants {
     }
 
     public static final class TurretConstants {
-        public static final int Turret_ID = 16;
+        public static final int Turret_ID = 19;
 
         public static final double MinSpeed = 0.05;
         public static final double ScanSpeed = 0.25;
@@ -101,7 +101,7 @@ public final class Constants {
     public static final class ClimberConstants {
         public static final int LowStage_Forward_ID = 2;
         public static final int LowStage_Reverse_ID = 5;
-        public static final int HighStage_ID = 4;
+        public static final int HighStage_ID = 7;
         public static final int HighStageClosedLimitSwitch = 0;
         public static final double HighStageMaxSpeed = .25;
     }
