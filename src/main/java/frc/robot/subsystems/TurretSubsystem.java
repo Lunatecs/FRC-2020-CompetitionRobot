@@ -23,6 +23,8 @@ public class TurretSubsystem extends SubsystemBase {
   private NeutralMode TURRET_NEUTRALMODE = NeutralMode.Brake;
   private PIDController pidControllerFwd;
   private PIDController pidControllerBck;
+  private PIDController pidControllerLock;
+  private boolean lock = false;
   /**
    * Creates a new TurretSubsystem.
    */
@@ -35,12 +37,28 @@ public class TurretSubsystem extends SubsystemBase {
     pidControllerBck = new PIDController(TurretConstants.BckKp,TurretConstants.BckKi,TurretConstants.BckKd);
     pidControllerBck.setSetpoint(TurretConstants.BckMaxSensorPostion);
     turret.setSensorPhase(true);
+    this.pidControllerLock = new PIDController(0.0, 0.0, .9);
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
     SmartDashboard.putNumber("Turret Encoder", getPosition());
+
+    if(lock) {
+      this.setTurretSpeed(pidControllerLock.calculate(this.getPosition()), true);
+    }
+
+    super.periodic();
+  }
+
+  public void lock() {
+    lock = true;
+    pidControllerLock.setSetpoint(this.getPosition());
+  }
+
+  public void unLock() {
+    lock = false;
   }
 
   /**
