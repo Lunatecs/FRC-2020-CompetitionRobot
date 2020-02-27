@@ -99,8 +99,8 @@ public final class Constants {
     }
 
     public static final class ClimberConstants {
-        public static final int LowStage_Forward_ID = 2;
-        public static final int LowStage_Reverse_ID = 5;
+        public static final int LowStage_Forward_ID = 1;
+        public static final int LowStage_Reverse_ID = 6;
         public static final int HighStage_ID = 7;
         public static final int HighStageClosedLimitSwitch = 0;
         public static final double HighStageMaxSpeed = .25;
@@ -109,8 +109,8 @@ public final class Constants {
     public static final class ShooterConstants {
         public static final int Flywheel_Left_ID = 1;
         public static final int Flywheel_Right_ID = 2;
-        public static final int Hood_Forward_ID = 1;
-        public static final int Hood_Reverse_ID = 6;
+        public static final int Hood_Forward_ID = 2;
+        public static final int Hood_Reverse_ID = 5;
     }
 
     public static final class ControllerConstants {
