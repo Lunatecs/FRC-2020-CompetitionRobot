@@ -11,7 +11,9 @@ import java.io.IOException;
 import java.nio.file.Path;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.PIDCommand;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
+import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
@@ -19,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.TrapezoidProfileCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -37,11 +40,13 @@ import frc.robot.Constants.CharacterizationConstants;
 import frc.robot.Constants.ClimberConstants;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.PathFollowingConstants;
+import frc.robot.Constants.TrackingConstants;
 import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.buttons.JoystickAxisButton;
 import frc.robot.commands.AdjustFlyWheelCommand;
 import frc.robot.commands.CurvatureWithJoysticksCommand;
 import frc.robot.commands.ScanForTargetCommand;
+import frc.robot.commands.ShootAutoCommandGroup;
 import frc.robot.commands.DoNothingAutoCommand;
 import frc.robot.commands.DriveWithJoysticksCommand;
 import frc.robot.commands.FlyWheelCommand;
@@ -95,19 +100,73 @@ public class RobotContainer {
 
   public void configureAutos() {
     SmartDashboard.putBoolean("IsHere", false);
-    final ParallelCommandGroup threeShootAndForward = new ParallelCommandGroup(
-      scanForTarget,  
-      new SequentialCommandGroup(
+
+    PIDController turretPIDController = new PIDController(TrackingConstants.kP, 
+                                                          TrackingConstants.kI, 
+                                                          TrackingConstants.kD);
+    
+    turretPIDController.setTolerance(1.0);
+
+    SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(CharacterizationConstants.ksVolts,
+                                                                    CharacterizationConstants.kvVoltSecondsPerMeter,
+                                                                    CharacterizationConstants.kaVoltsSecondsSquaredPerMeter);
+
+
+    final SequentialCommandGroup oldThreeShootAndForward = new SequentialCommandGroup(
         new InstantCommand(() -> {shooter.setSetpoint(3650); shooter.enable();}),
+        new PIDCommand(
+          turretPIDController, limelight::getTX, 0, output -> turret.setTurretSpeed(output, true), turret),
         new WaitUntilCommand(shooter::atSetpoint),
         new WaitUntilCommand(limelight::isOnTarget),
+        new InstantCommand(() -> turret.lock()),
         new InstantCommand(() -> {feeder.setFeederSpeed(-1); tower.setConveyorSpeed(1); SmartDashboard.putBoolean("IsHere", true);}),
         new WaitCommand(2),
-        new InstantCommand(() -> {shooter.disable(); tower.setConveyorSpeed(0); feeder.setFeederSpeed(0);})
-      )
+        new InstantCommand(() -> {shooter.disable(); tower.setConveyorSpeed(0); turret.unLock(); feeder.setFeederSpeed(0);}),
+        new TrapezoidProfileCommand(
+                new TrapezoidProfile(
+                    // Limit the max acceleration and velocity
+                    new TrapezoidProfile.Constraints(
+                     CharacterizationConstants.MaxSpeedMetersPerSecond,
+                     CharacterizationConstants.MaxAccelerationMetersPerSecondSquared),
+                    // End at desired position in meters; implicitly starts at 0
+                    new TrapezoidProfile.State(2, 0)),
+                // Pipe the profile state to the drive
+                setpointState -> driveTrain.arcadeDrive(-feedforward.calculate(setpointState.velocity)/12.0, 0),
+                // Require the drive
+                driveTrain).beforeStarting(() -> driveTrain.resetEncoders(), driveTrain)
     );
 
-    autoChooser.addOption("ThreeShootAndForward", threeShootAndForward);
+    autoChooser.addOption("OldThreeShootAndForward", oldThreeShootAndForward);
+
+    ShootAutoCommandGroup threeShootAndForward = new ShootAutoCommandGroup(
+      1, 
+      turretPIDController, 
+      feedforward, 
+      feeder, 
+      limelight, 
+      shooter, 
+      driveTrain, 
+      tower, 
+      turret, 
+      intake, false);
+
+      autoChooser.addOption("ThreeShootAndForward", threeShootAndForward);
+
+    ShootAutoCommandGroup threeShootAndForwardGrabThreeShoot = new ShootAutoCommandGroup(
+      2, 
+      turretPIDController, 
+      feedforward, 
+      feeder, 
+      limelight, 
+      shooter, 
+      driveTrain, 
+      tower, 
+      turret, 
+      intake, true);
+    
+    autoChooser.addOption("ThreeShootAndForwardGrabThreeShoot", threeShootAndForwardGrabThreeShoot);
+
+
     final DoNothingAutoCommand doNothing = new DoNothingAutoCommand();
 
     try {
