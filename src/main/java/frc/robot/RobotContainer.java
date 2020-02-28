@@ -139,7 +139,7 @@ public class RobotContainer {
     autoChooser.addOption("OldThreeShootAndForward", oldThreeShootAndForward);
 
     ShootAutoCommandGroup threeShootAndForward = new ShootAutoCommandGroup(
-      1, 
+      -3, 
       turretPIDController, 
       feedforward, 
       feeder, 
@@ -217,7 +217,7 @@ public class RobotContainer {
     //Setpoint needs to be 1000 above what you want to hit. ie. 5500 is actualy aiming for 4500
     new POVButton(operatorJoystick, 0).whileHeld(() -> {shooter.setSetpoint(3650); shooter.enable();})
                                       .whenReleased(() -> shooter.disable());
-    new POVButton(operatorJoystick, 180).whileHeld(() -> {shooter.setSetpoint(5000); shooter.enable();})
+    new POVButton(operatorJoystick, 180).whileHeld(() -> {shooter.setSetpoint(5650); shooter.enable();})
                                       .whenReleased(() -> shooter.disable());
     // new POVButton(operatorJoystick, 0).whileHeld(new FlyWheelCommand(shooter, 4000));
     // new POVButton(operatorJoystick, 180).whileHeld(new FlyWheelCommand(shooter, 5500));
@@ -252,6 +252,7 @@ public class RobotContainer {
       }
     },
     this.climber));
+    scheduler.registerSubsystem(limelight);
   }
 
   public void configureDriverButtonBindings(String drive) {

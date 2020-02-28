@@ -50,9 +50,9 @@ public class ScanForTargetCommand extends CommandBase {
       turret.setTurretSpeed(speed, true);
     } else {
       if(turret.isFwdLimit()) {
-        scanSpeed = -.75;
+        scanSpeed = -.4;
       } else if(turret.isRevLimit()) {
-        scanSpeed = .75;
+        scanSpeed = .4;
       }
       turret.setTurretSpeed(scanSpeed);
     }

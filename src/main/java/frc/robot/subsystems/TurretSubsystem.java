@@ -53,8 +53,8 @@ public class TurretSubsystem extends SubsystemBase {
   }
 
   public void lock() {
-    lock = true;
-    pidControllerLock.setSetpoint(this.getPosition());
+    lock = false;
+    //pidControllerLock.setSetpoint(this.getPosition());
   }
 
   public void unLock() {

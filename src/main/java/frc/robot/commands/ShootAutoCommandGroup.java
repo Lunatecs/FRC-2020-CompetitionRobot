@@ -46,14 +46,17 @@ public class ShootAutoCommandGroup extends SequentialCommandGroup {
                               boolean threemore) {
     // Add your commands in the super() call, e.g.
     // super(new FooCommand(), new BarCommand());
-    super(
-      new InstantCommand(() intake.lowerIntake()),
+    super();
+    SmartDashboard.putBoolean("Make it", false);
+    SmartDashboard.putBoolean("Make it 2", false);
+    this.addCommands(
+      new InstantCommand(() -> intake.lowerIntake()),
       new InstantCommand(() -> {shooter.setSetpoint(3650); shooter.enable();}),
-      new PIDCommand(
-        turretPIDController, limelight::getTX, 0, output -> turret.setTurretSpeed(output, true), turret),
+      new AutoAimCommand(turret, limelight),
+      new InstantCommand(() -> SmartDashboard.putBoolean("Make it", true)),
       new WaitUntilCommand(shooter::atSetpoint),
-      new WaitUntilCommand(limelight::isOnTarget),
-      new InstantCommand(() -> turret.lock()),
+      new InstantCommand(() -> SmartDashboard.putBoolean("Make it 2", true)),
+      //new InstantCommand(() -> turret.lock()),
       new InstantCommand(() -> {feeder.setFeederSpeed(-1); tower.setConveyorSpeed(1); SmartDashboard.putBoolean("IsHere", true);}),
       new WaitCommand(2),
       new InstantCommand(() -> {shooter.disable(); tower.setConveyorSpeed(0); turret.unLock(); feeder.setFeederSpeed(0);}));

@@ -48,7 +48,7 @@ public class LimelightSubsystem extends SubsystemBase {
   }
 
   public boolean isOnTarget() {
-    return Math.abs(this.getTX()) <= 1;
+    return this.isValidTarget() &&  Math.abs(this.getTX()) <= 1;
   }
 
   public void setCamMode(double value){

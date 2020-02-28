@@ -87,7 +87,7 @@ public final class Constants {
         public static final double MinSpeed = 0.05;
         public static final double ScanSpeed = 0.25;
         
-        public static final int FwdMaxSensorPostion = 12000;
+        public static final int FwdMaxSensorPostion = 11000;
         public static final double FwdKp = 0.00015;
         public static final double FwdKd = 0.0;
         public static final double FwdKi = 0.0;
