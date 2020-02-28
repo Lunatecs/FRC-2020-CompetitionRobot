@@ -52,14 +52,14 @@ public class IntakeSubsystem extends SubsystemBase {
    * Raises intake using the piston.
    */
   public void raiseIntake() {
-    intakeWrist.set(DoubleSolenoid.Value.kReverse);
+    intakeWrist.set(DoubleSolenoid.Value.kForward);
     this.isLowered = false;
   }
   /**
    * Lowers intake using the piston.
    */
   public void lowerIntake() {
-    intakeWrist.set(DoubleSolenoid.Value.kForward);
+    intakeWrist.set(DoubleSolenoid.Value.kReverse);
     this.isLowered = true;
   }
 

@@ -207,7 +207,8 @@ public class RobotContainer {
     // new JoystickButton(operatorJoystick, ControllerConstants.Right_Bumper_ID)
     //                                                                  .whenPressed(() -> shooter.setFlyWheelSpeed(.9))
     //                                                                  .whenReleased(() -> shooter.setFlyWheelSpeed(0));
-
+    new JoystickButton(operatorJoystick, ControllerConstants.Blue_Button_ID).whenPressed(() -> shooter.lowerHood());
+    new JoystickButton(operatorJoystick, ControllerConstants.Yellow_Button_ID).whenPressed(() -> shooter.raiseHood());
     new JoystickButton(operatorJoystick, ControllerConstants.Left_Bumper_ID)
                                                                     .whenPressed(() -> {feeder.setFeederSpeed(-1);
                                                                                         tower.setConveyorSpeed(1);})
@@ -219,23 +220,6 @@ public class RobotContainer {
                                       .whenReleased(() -> shooter.disable());
     new POVButton(operatorJoystick, 180).whileHeld(() -> {shooter.setSetpoint(5650); shooter.enable();})
                                       .whenReleased(() -> shooter.disable());
-    // new POVButton(operatorJoystick, 0).whileHeld(new FlyWheelCommand(shooter, 4000));
-    // new POVButton(operatorJoystick, 180).whileHeld(new FlyWheelCommand(shooter, 5500));
-//     new POVButton(operatorJoystick, 0).whileHeld(new AdjustFlyWheelCommand(shooter, 4500));
-// //                                      .whenReleased(new InstantCommand(() -> shooter.setFlyWheelSpeed(0), shooter));
-
-//     new POVButton(operatorJoystick, 180).whileHeld(new AdjustFlyWheelCommand(shooter, 5500));
-// //                                      .whenReleased(new InstantCommand(() -> shooter.setFlyWheelSpeed(0), shooter));
-
-    new JoystickButton(operatorJoystick, ControllerConstants.Blue_Button_ID).whenPressed(() ->
-    { 
-      if (shooter.isLowered()) {
-        shooter.raiseHood();
-      } else {
-        shooter.lowerHood();
-      }
-    });
-
     new JoystickButton(operatorJoystick, ControllerConstants.Red_Button_ID).whileActiveContinuous(scanForTarget); 
 
   }
@@ -264,23 +248,11 @@ public class RobotContainer {
                                                                           .whenPressed(() -> driveTrain.setMaxOutput(.5))
                                                                           .whenReleased(() -> driveTrain.setMaxOutput(.85));
 
-    new JoystickButton(driverJoystick, ControllerConstants.Yellow_Button_ID).whenPressed(() -> 
-    { 
-      if (intake.isLowered()) {
-        intake.raiseIntake();
-      } else {
-        intake.lowerIntake();
-      }
-    });
+    new JoystickButton(driverJoystick, ControllerConstants.Yellow_Button_ID).whenPressed(() -> intake.raiseIntake());
+    new JoystickButton(driverJoystick, ControllerConstants.Blue_Button_ID).whenPressed(() -> intake.lowerIntake());
 
-    new JoystickButton(driverJoystick, ControllerConstants.Green_Button_ID).whenPressed(() -> 
-    {
-      if (climber.isLowered()) {
-        climber.raiseLowStage();
-      } else {
-        climber.lowerLowStage();
-      }
-    });
+    new JoystickButton(driverJoystick, ControllerConstants.Green_Button_ID).whenPressed(() -> climber.lowerLowStage());
+    new JoystickButton(driverJoystick, ControllerConstants.Red_Button_ID).whenPressed(() -> climber.raiseLowStage());
 
     if(drive=="Arcade") {
       new JoystickAxisButton(driverJoystick, ControllerConstants.Right_Trigger_ID)

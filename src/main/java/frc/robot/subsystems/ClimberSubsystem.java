@@ -66,12 +66,12 @@ public class ClimberSubsystem extends SubsystemBase {
   }
 
   public void raiseLowStage() {
-    lowStageWrist.set(DoubleSolenoid.Value.kForward);
+    lowStageWrist.set(DoubleSolenoid.Value.kReverse);
     this.isLowered = false;
   }
 
   public void lowerLowStage() {
-    lowStageWrist.set(DoubleSolenoid.Value.kReverse);
+    lowStageWrist.set(DoubleSolenoid.Value.kForward);
     this.isLowered = true;
   }
 
