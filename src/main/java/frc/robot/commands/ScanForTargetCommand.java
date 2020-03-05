@@ -8,6 +8,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.LimelightConstants;
 import frc.robot.Constants.TrackingConstants;
 import frc.robot.Constants.TurretConstants;
 import frc.robot.subsystems.LimelightSubsystem;
@@ -37,14 +38,14 @@ public class ScanForTargetCommand extends CommandBase {
   // Called when the command is initially schedSuled.
   @Override
   public void initialize() {
-   
+   limelight.setLED(LimelightConstants.forceOn_ID);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
     double speed = 0.0;
-    SmartDashboard.putBoolean("IsValidTarget", limelight.isValidTarget());
+    //SmartDashboard.putBoolean("IsValidTarget", limelight.isValidTarget());
     if(limelight.isValidTarget()) {
       speed = pController.calculate(limelight.getTX(), 0);
       turret.setTurretSpeed(speed, true);
@@ -56,15 +57,16 @@ public class ScanForTargetCommand extends CommandBase {
       }
       turret.setTurretSpeed(scanSpeed);
     }
-    SmartDashboard.putBoolean("Fwd", turret.isFwdLimit());
-    SmartDashboard.putBoolean("Rev", turret.isRevLimit());
-    SmartDashboard.putNumber("Tx", limelight.getTX());
-    SmartDashboard.putNumber("speed", speed);
+    //SmartDashboard.putBoolean("Fwd", turret.isFwdLimit());
+    //SmartDashboard.putBoolean("Rev", turret.isRevLimit());
+    //SmartDashboard.putNumber("Tx", limelight.getTX());
+    //SmartDashboard.putNumber("speed", speed);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    limelight.setLED(LimelightConstants.forceOff_ID);
   }
 
   // Returns true when the command should end.
