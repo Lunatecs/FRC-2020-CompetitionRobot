@@ -72,8 +72,8 @@ public class TurretSubsystem extends SubsystemBase {
     int position = getPosition(); 
     double speedLimitFwd = pidControllerFwd.calculate(position);
     double speedLimitBck = pidControllerBck.calculate(position);
-    SmartDashboard.putNumber("speedLimitFwd", speedLimitFwd);
-    SmartDashboard.putNumber("speedLimitBck", speedLimitBck);
+    //SmartDashboard.putNumber("speedLimitFwd", speedLimitFwd);
+    //SmartDashboard.putNumber("speedLimitBck", speedLimitBck);
     
     if(speed > speedLimitFwd && speed > 0) {
       speed = speedLimitFwd;
@@ -87,7 +87,7 @@ public class TurretSubsystem extends SubsystemBase {
         speed = TurretConstants.MinSpeed;
       }
     }
-    SmartDashboard.putNumber("actualSpeed", speed);
+    //SmartDashboard.putNumber("actualSpeed", speed);
     turret.set(ControlMode.PercentOutput, speed);
   }
 
