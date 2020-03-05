@@ -45,6 +45,13 @@ public final class Constants {
 
         public static final double kPDriveVel = 10.6;
 
+        public static final double secondKsVolts = 0.225;
+        public static final double secondKvVoltsSecondsPerMeter = 2.53;
+        public static final double secondKaVoltsSecondsSquaredPerMeter = 0.443;
+
+        public static final double secondKpDrivePos = 35.1;
+        public static final double secondKdDrivePos = 16;
+
     }
 
     public static final class PathFollowingConstants {
@@ -103,7 +110,7 @@ public final class Constants {
         public static final int LowStage_Reverse_ID = 6;
         public static final int HighStage_ID = 7;
         public static final int HighStageClosedLimitSwitch = 0;
-        public static final double HighStageMaxSpeed = .25;
+        public static final double HighStageMaxSpeed = .7;
     }
 
     public static final class ShooterConstants {
@@ -139,4 +146,10 @@ public final class Constants {
         public static final int Left_Select_ID = 7;
         public static final int Right_Select_ID = 8;
     }
+
+    public static final class LimelightConstants {
+        public static final int forceOff_ID = 1;
+        public static final int forceOn_ID = 3;
+    }
+
 }
