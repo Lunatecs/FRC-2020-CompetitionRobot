@@ -31,9 +31,12 @@ public class ShooterSubsystem extends PIDSubsystem {
 
   /**
    * Creates a new ShooterSubsystem.
+   * 
+   * kF - 1/4800 = .00020833
+   * 
    */
   public ShooterSubsystem() {
-    //0.0009,0 0.00009
+    //0.0009,0, 0.00009
     super(new PIDController(0.0009, 0.0, 0.00009), 0);
 
     leftFlywheel.restoreFactoryDefaults();
@@ -49,8 +52,8 @@ public class ShooterSubsystem extends PIDSubsystem {
   @Override
   public void periodic() {
     super.periodic();
-    SmartDashboard.putNumber("Left Velocity", this.getLeftEncoderVelocity());
-    SmartDashboard.putNumber("Right Velocity", this.getRightEncoderVelocity());
+    //SmartDashboard.putNumber("Left Velocity", this.getLeftEncoderVelocity());
+    //SmartDashboard.putNumber("Right Velocity", this.getRightEncoderVelocity());
     SmartDashboard.putBoolean("AtSetpoint", this.atSetpoint());
     SmartDashboard.putNumber("AVG Velocity", (this.getRightEncoderVelocity() + this.getRightEncoderVelocity())/2.0);
     // This method will be called once per scheduler run
@@ -76,7 +79,7 @@ public class ShooterSubsystem extends PIDSubsystem {
   @Override
   public void useOutput(double output, double setPoint) {
     this.setFlyWheelSpeed(output);
-    SmartDashboard.putString("PID Output", output + ":" + this.getController().getSetpoint());
+    //SmartDashboard.putString("PID Output", output + ":" + this.getController().getSetpoint());
   }
 
   /**
