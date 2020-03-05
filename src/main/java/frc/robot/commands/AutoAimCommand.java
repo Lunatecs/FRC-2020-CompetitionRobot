@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.TrackingConstants;
 import frc.robot.subsystems.LimelightSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
+import java.util.Date;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
@@ -23,16 +24,28 @@ public class AutoAimCommand extends CommandBase {
   TurretSubsystem turret;    
   PIDController pidController = new PIDController(0.03, 
                                                   TrackingConstants.kI, 
-                                                  TrackingConstants.kD);                                              
+                                                  TrackingConstants.kD);         
+  double scanSpeed = .2;
+  long start = 0;                                     
   /**
    *
    * Creates a new AutoAimCommand.
    */
-  public AutoAimCommand(TurretSubsystem turret, LimelightSubsystem limelight) {
+  public AutoAimCommand(TurretSubsystem turret, LimelightSubsystem limelight, boolean rightScan) {
     this.turret = turret;
     this.limelight = limelight;
     this.pidController.setSetpoint(0);
     addRequirements(turret);
+    if(rightScan) {
+      scanSpeed = -.2;
+    }
+  }
+
+  @Override
+  public void initialize() {
+    // TODO Auto-generated method stub
+    super.initialize();
+    this.start = new Date().getTime();
   }
 
   @Override
@@ -40,14 +53,15 @@ public class AutoAimCommand extends CommandBase {
     if(limelight.isValidTarget()) {
       turret.setTurretSpeed(this.pidController.calculate(limelight.getTX()), true);
     } else {
-      turret.setTurretSpeed(.2, true);
+      turret.setTurretSpeed(scanSpeed, true);
     }
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    SmartDashboard.putBoolean("New End Auto Aim", limelight.isOnTarget());
-    return limelight.isOnTarget();
+    //SmartDashboard.putBoolean("New End Auto Aim", limelight.isOnTarget());
+    //After two seconds have passed and we are on target
+    return limelight.isOnTarget() && new Date().getTime() > start + 2000;
   }
 }
