@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.TrapezoidProfileCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants.CharacterizationConstants;
+import frc.robot.Constants.LimelightConstants;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.FeederSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -43,21 +44,23 @@ public class ShootAutoCommandGroup extends SequentialCommandGroup {
                               TowerSubsystem tower,
                               TurretSubsystem turret,
                               IntakeSubsystem intake,
-                              boolean threemore) {
+                              boolean threemore,
+                              boolean scanRight) {
     // Add your commands in the super() call, e.g.
     // super(new FooCommand(), new BarCommand());
     super();
-    SmartDashboard.putBoolean("Make it", false);
-    SmartDashboard.putBoolean("Make it 2", false);
+    //SmartDashboard.putBoolean("Make it", false);
+    //SmartDashboard.putBoolean("Make it 2", false);
     this.addCommands(
+      new InstantCommand(() -> limelight.setLED(LimelightConstants.forceOn_ID)),
       new InstantCommand(() -> intake.lowerIntake()),
       new InstantCommand(() -> {shooter.setSetpoint(3650); shooter.enable();}),
-      new AutoAimCommand(turret, limelight),
-      new InstantCommand(() -> SmartDashboard.putBoolean("Make it", true)),
+      new AutoAimCommand(turret, limelight, scanRight),
+      //new InstantCommand(() -> SmartDashboard.putBoolean("Make it", true)),
       new WaitUntilCommand(shooter::atSetpoint),
-      new InstantCommand(() -> SmartDashboard.putBoolean("Make it 2", true)),
+      //new InstantCommand(() -> SmartDashboard.putBoolean("Make it 2", true)),
       //new InstantCommand(() -> turret.lock()),
-      new InstantCommand(() -> {feeder.setFeederSpeed(-1); tower.setConveyorSpeed(1); SmartDashboard.putBoolean("IsHere", true);}),
+      new InstantCommand(() -> {feeder.setFeederSpeed(-1); tower.setConveyorSpeed(1);}),
       new WaitCommand(2),
       new InstantCommand(() -> {shooter.disable(); tower.setConveyorSpeed(0); turret.unLock(); feeder.setFeederSpeed(0);}));
 
@@ -91,7 +94,23 @@ public class ShootAutoCommandGroup extends SequentialCommandGroup {
         new InstantCommand(() -> {shooter.disable(); tower.setConveyorSpeed(0); turret.unLock(); feeder.setFeederSpeed(0);})
       );
     }
-
+    this.addCommands(new InstantCommand(() -> limelight.setLED(LimelightConstants.forceOff_ID)));
 
   }
+  public ShootAutoCommandGroup(double meters, 
+                                PIDController turretPIDController,
+                                SimpleMotorFeedforward feedforward,
+                                FeederSubsystem feeder, 
+                                LimelightSubsystem limelight, 
+                                ShooterSubsystem shooter, 
+                                DrivetrainSubsystem driveTrain, 
+                                TowerSubsystem tower,
+                                TurretSubsystem turret,
+                                IntakeSubsystem intake,
+                                boolean threemore) {
+
+      this(meters, turretPIDController, feedforward, feeder, limelight, shooter, driveTrain, tower, turret, intake, threemore, false);
+
+    }
+
 }
