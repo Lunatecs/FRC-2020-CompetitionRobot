@@ -59,6 +59,10 @@ public class LimelightSubsystem extends SubsystemBase {
     table.getEntry("stream").setDouble(value);
   }
 
+  public void setLED(double value) {
+    table.getEntry("ledMode").setNumber(value);
+  }
+
   public void setPipeline(double value){
     table.getEntry("pipeline").setDouble(value);
   }
