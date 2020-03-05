@@ -22,11 +22,13 @@ public class ClimberSubsystem extends SubsystemBase {
 
   private final DoubleSolenoid lowStageWrist = new DoubleSolenoid(ClimberConstants.LowStage_Forward_ID, ClimberConstants.LowStage_Reverse_ID);
   private final TalonSRX highStage = new TalonSRX(ClimberConstants.HighStage_ID);
-  private final DigitalInput highStageClosedLimitSwitch = new DigitalInput(ClimberConstants.HighStageClosedLimitSwitch);
+  //private final DigitalInput highStageClosedLimitSwitch = new DigitalInput(ClimberConstants.HighStageClosedLimitSwitch);
 
   private static NeutralMode HIGHSTAGE_NEUTRALMODE = NeutralMode.Brake;
   
   private boolean isLowered = true;
+  private boolean isOffLimit = false;
+  private boolean isStop = false;
   /**
    * Creates a new ClimberSubsystem.
    */
@@ -38,7 +40,7 @@ public class ClimberSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putBoolean("Retracted", this.isHighStageRetracted());
+    //SmartDashboard.putBoolean("Retracted", this.isHighStageRetracted());
     // This method will be called once per scheduler run
   }
 
@@ -49,11 +51,12 @@ public class ClimberSubsystem extends SubsystemBase {
    */
   public boolean isHighStageRetracted() {
     //Have to swap true and false because sensor is normally closed
-    if (!highStageClosedLimitSwitch.get()) {
+    /*if (!highStageClosedLimitSwitch.get()) {
       return true;
     } else {
       return false;
-    }
+    }*/
+    return false;
   }
 
   /**
@@ -61,8 +64,33 @@ public class ClimberSubsystem extends SubsystemBase {
    * @param speed
    */
   public void setHighStage(double speed) {
+    
     SmartDashboard.putNumber("Climb Speed", speed);
-    highStage.set(ControlMode.PercentOutput, speed);
+    /*SmartDashboard.putBoolean("Limit Switch", isHighStageRetracted());
+    SmartDashboard.putBoolean("Is Stop", isStop);
+    SmartDashboard.putBoolean("Is off Limit", isOffLimit);
+    if (isHighStageRetracted() && isOffLimit) {
+      isStop = true;
+    }
+    if (!isHighStageRetracted()) {
+      isOffLimit = true;
+    }
+    if (!isStop) {
+      if(Math.abs(speed) > .15) {
+        highStage.set(ControlMode.PercentOutput, speed);
+      } else {
+        highStage.set(ControlMode.PercentOutput, 0.0);
+      }
+    } else {
+      highStage.set(ControlMode.PercentOutput, 0.0);
+    }
+    */
+    if(Math.abs(speed) > .15) {
+      highStage.set(ControlMode.PercentOutput, speed);
+    } else {
+      highStage.set(ControlMode.PercentOutput, 0.0);
+    }
+
   }
 
   public void raiseLowStage() {
