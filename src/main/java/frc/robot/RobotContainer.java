@@ -34,6 +34,7 @@ import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 
 import frc.robot.Constants.CharacterizationConstants;
@@ -99,7 +100,6 @@ public class RobotContainer {
   }
 
   public void configureAutos() {
-    SmartDashboard.putBoolean("IsHere", false);
 
     PIDController turretPIDController = new PIDController(TrackingConstants.kP, 
                                                           TrackingConstants.kI, 
@@ -111,7 +111,7 @@ public class RobotContainer {
                                                                     CharacterizationConstants.kvVoltSecondsPerMeter,
                                                                     CharacterizationConstants.kaVoltsSecondsSquaredPerMeter);
 
-
+    /*
     final SequentialCommandGroup oldThreeShootAndForward = new SequentialCommandGroup(
         new InstantCommand(() -> {shooter.setSetpoint(3650); shooter.enable();}),
         new PIDCommand(
@@ -137,7 +137,7 @@ public class RobotContainer {
     );
 
     autoChooser.addOption("OldThreeShootAndForward", oldThreeShootAndForward);
-
+    */
     ShootAutoCommandGroup threeShootAndForward = new ShootAutoCommandGroup(
       -3, 
       turretPIDController, 
@@ -150,8 +150,83 @@ public class RobotContainer {
       turret, 
       intake, false);
 
-      autoChooser.addOption("ThreeShootAndForward", threeShootAndForward);
+    autoChooser.addOption("RIGHT Three Shoot And Forward", threeShootAndForward);
 
+    ShootAutoCommandGroup threeShootAndReverse = new ShootAutoCommandGroup(
+      3, 
+      turretPIDController, 
+      feedforward, 
+      feeder, 
+      limelight, 
+      shooter, 
+      driveTrain, 
+      tower, 
+      turret, 
+      intake, false);
+  
+    autoChooser.addOption("RIGHT Three Shoot And Reverse", threeShootAndReverse);
+
+    SequentialCommandGroup waitFiveThenThreeShootAndForward = new SequentialCommandGroup(
+      new WaitCommand(5),
+      new ShootAutoCommandGroup(
+      -3, 
+      turretPIDController, 
+      feedforward, 
+      feeder, 
+      limelight, 
+      shooter, 
+      driveTrain, 
+      tower, 
+      turret, 
+      intake, false));
+
+    autoChooser.addOption("RIGHT Wait Five Then Three Shoot And Forward", waitFiveThenThreeShootAndForward);
+
+    ShootAutoCommandGroup leftThreeShootAndForward = new ShootAutoCommandGroup(
+      -3, 
+      turretPIDController, 
+      feedforward, 
+      feeder, 
+      limelight, 
+      shooter, 
+      driveTrain, 
+      tower, 
+      turret, 
+      intake, false);
+
+    autoChooser.addOption("LEFT Three Shoot And Forward", leftThreeShootAndForward);
+
+    ShootAutoCommandGroup leftThreeShootAndReverse = new ShootAutoCommandGroup(
+      3, 
+      turretPIDController, 
+      feedforward, 
+      feeder, 
+      limelight, 
+      shooter, 
+      driveTrain, 
+      tower, 
+      turret, 
+      intake, false, true);
+  
+    autoChooser.addOption("LEFT Three Shoot And Reverse", leftThreeShootAndReverse);
+
+    SequentialCommandGroup leftWaitFiveThenThreeShootAndForward = new SequentialCommandGroup(
+      new WaitCommand(5),
+      new ShootAutoCommandGroup(
+      -3, 
+      turretPIDController, 
+      feedforward, 
+      feeder, 
+      limelight, 
+      shooter, 
+      driveTrain, 
+      tower, 
+      turret, 
+      intake, false, true));
+
+    autoChooser.addOption("LEFT Wait Five Then Three Shoot And Forward", leftWaitFiveThenThreeShootAndForward);
+
+    /*
     ShootAutoCommandGroup threeShootAndForwardGrabThreeShoot = new ShootAutoCommandGroup(
       2, 
       turretPIDController, 
@@ -165,7 +240,7 @@ public class RobotContainer {
       intake, true);
     
     autoChooser.addOption("ThreeShootAndForwardGrabThreeShoot", threeShootAndForwardGrabThreeShoot);
-
+    */
 
     final DoNothingAutoCommand doNothing = new DoNothingAutoCommand();
 
@@ -214,14 +289,30 @@ public class RobotContainer {
                                                                                         tower.setConveyorSpeed(1);})
                                                                     .whenReleased(() -> {feeder.setFeederSpeed(0);
                                                                                         tower.setConveyorSpeed(0);});
+
+    new JoystickButton(operatorJoystick, ControllerConstants.Right_Bumper_ID)
+                                                                    .whenPressed(() -> {feeder.setFeederSpeed(1);
+                                                                                        tower.setConveyorSpeed(-1);})
+                                                                    .whenReleased(() -> {feeder.setFeederSpeed(0);
+                                                                                        tower.setConveyorSpeed(0);});
     
     //Setpoint needs to be 1000 above what you want to hit. ie. 5500 is actualy aiming for 4500
-    new POVButton(operatorJoystick, 0).whileHeld(() -> {shooter.setSetpoint(3650); shooter.enable();})
-                                      .whenReleased(() -> shooter.disable());
-    new POVButton(operatorJoystick, 180).whileHeld(() -> {shooter.setSetpoint(5650); shooter.enable();})
-                                      .whenReleased(() -> shooter.disable());
+    new POVButton(operatorJoystick, 0).whileHeld(() -> {shooter.setSetpoint(3650); shooter.enable(); SmartDashboard.putBoolean("UPPOV", true);})
+                                      .whenReleased(() -> {shooter.disable(); SmartDashboard.putBoolean("UPPOV", false);});
+    new POVButton(operatorJoystick, 180).whileHeld(() -> {shooter.setSetpoint(4500); shooter.enable(); SmartDashboard.putBoolean("DOWNPOV", true);})
+                                      .whenReleased(() -> {shooter.disable(); SmartDashboard.putBoolean("DOWNPOV", false);});
+    new POVButton(operatorJoystick, 90).whileHeld(() -> {shooter.setSetpoint(4800); shooter.enable(); SmartDashboard.putBoolean("RIGHTPOV", true);})
+                                      .whenReleased(() -> {shooter.disable(); SmartDashboard.putBoolean("RIGHTPOV", false);});
+    new POVButton(operatorJoystick, 270).whileHeld(() -> {shooter.setSetpoint(5500); shooter.enable(); SmartDashboard.putBoolean("LEFTPOV", true);})
+    .whenReleased(() -> {shooter.disable(); SmartDashboard.putBoolean("LEFTPOV", false);});
     new JoystickButton(operatorJoystick, ControllerConstants.Red_Button_ID).whileActiveContinuous(scanForTarget); 
 
+    new JoystickButton(this.operatorJoystick, ControllerConstants.Left_Select_ID)
+                                                                    .whileHeld(new InstantCommand(() -> this.climber.setHighStage(-0.25),climber))
+                                                                    .whenReleased(new InstantCommand(() -> this.climber.setHighStage(-0.0),climber));
+
+    new JoystickButton(this.operatorJoystick, ControllerConstants.Right_Select_ID).whileHeld(() -> {shooter.disable(); shooter.setFlyWheelSpeed(1.0);})
+                                                                                  .whenReleased(() -> shooter.setFlyWheelSpeed(0.0));
   }
 
   private void configureDefaultCommands() {
@@ -229,11 +320,7 @@ public class RobotContainer {
     scheduler.setDefaultCommand(turret, manualTurret);
     scheduler.setDefaultCommand(climber, new RunCommand(() -> 
     { 
-      if(!climber.isHighStageRetracted()) {
-        climber.setHighStage(MathUtil.clamp(this.operatorJoystick.getRawAxis(ControllerConstants.Joystick_Right_Y_Axis),-ClimberConstants.HighStageMaxSpeed,ClimberConstants.HighStageMaxSpeed));  
-      } else {
-        climber.setHighStage(0.0);
-      }
+      climber.setHighStage(MathUtil.clamp(this.operatorJoystick.getRawAxis(ControllerConstants.Joystick_Right_Y_Axis),0.0,ClimberConstants.HighStageMaxSpeed));  
     },
     this.climber));
     scheduler.registerSubsystem(limelight);
@@ -241,18 +328,18 @@ public class RobotContainer {
 
   public void configureDriverButtonBindings(String drive) {
     new JoystickButton(driverJoystick, ControllerConstants.Right_Bumper_ID)
-                                                                          .whenPressed(() -> driveTrain.setMaxOutput(0.25))
+                                                                          .whenPressed(() -> driveTrain.setMaxOutput(0.5))
                                                                           .whenReleased(() -> driveTrain.setMaxOutput(.85));
 
     new JoystickButton(driverJoystick, ControllerConstants.Left_Bumper_ID)
-                                                                          .whenPressed(() -> driveTrain.setMaxOutput(.5))
+                                                                          .whenPressed(() -> driveTrain.setMaxOutput(.25))
                                                                           .whenReleased(() -> driveTrain.setMaxOutput(.85));
 
-    new JoystickButton(driverJoystick, ControllerConstants.Yellow_Button_ID).whenPressed(() -> intake.raiseIntake());
-    new JoystickButton(driverJoystick, ControllerConstants.Blue_Button_ID).whenPressed(() -> intake.lowerIntake());
+    new POVButton(driverJoystick, 0).whenPressed(() -> climber.raiseLowStage());
+    new POVButton(driverJoystick, 180).whenPressed(() -> climber.lowerLowStage());
 
-    new JoystickButton(driverJoystick, ControllerConstants.Green_Button_ID).whenPressed(() -> climber.lowerLowStage());
-    new JoystickButton(driverJoystick, ControllerConstants.Red_Button_ID).whenPressed(() -> climber.raiseLowStage());
+    new JoystickButton(driverJoystick, ControllerConstants.Yellow_Button_ID).whenPressed(() -> intake.raiseIntake());
+    new JoystickButton(driverJoystick, ControllerConstants.Green_Button_ID).whenPressed(() -> intake.lowerIntake());
 
     if(drive=="Arcade") {
       new JoystickAxisButton(driverJoystick, ControllerConstants.Right_Trigger_ID)
@@ -295,7 +382,7 @@ public class RobotContainer {
     CommandScheduler scheduler = CommandScheduler.getInstance();
     driveSelected = driveChooser.getSelected();
     
-    if (driveSelected == "Arcade") {
+    if (true) {
       configureDriverButtonBindings(driveSelected);
       configureOperatorButtonBindings();
       scheduler.setDefaultCommand(driveTrain, joystickDrive);
