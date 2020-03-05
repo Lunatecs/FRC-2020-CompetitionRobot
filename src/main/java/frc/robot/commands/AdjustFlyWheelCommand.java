@@ -55,7 +55,7 @@ public class AdjustFlyWheelCommand extends CommandBase {
 
   shooter.setFlyWheelSpeed(speed);
 
-  SmartDashboard.putNumber("ShooterSpeed", speed);
+  //SmartDashboard.putNumber("ShooterSpeed", speed);
 
   }
 
