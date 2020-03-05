@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ColorWheelConstants;
+import frc.robot.Constants.TowerConstants;
 
 public class DrivetrainSubsystem extends SubsystemBase {
 
@@ -33,8 +34,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
   private static NeutralMode DRIVE_NEUTRALMODE = NeutralMode.Brake;
 
-  private WPI_TalonSRX colorWheel = new WPI_TalonSRX(ColorWheelConstants.ColorWheel_ID);
-  private PigeonIMU gyro = new PigeonIMU(colorWheel);
+  private WPI_TalonSRX tower = new WPI_TalonSRX(TowerConstants.Conveyor_ID);
+  private PigeonIMU gyro = new PigeonIMU(tower);
   private DifferentialDrive drive;
   private DifferentialDriveOdometry driveOdometry;
   /**
@@ -63,12 +64,12 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("R Encoder", this.getRightEncoderValue());
-    SmartDashboard.putNumber("L Encoder", this.getLeftEncoderValue());
-    SmartDashboard.putNumber("R Encoder Distance", this.getRightEncoderDistance());
-    SmartDashboard.putNumber("L Encoder Distance", this.getLeftEncoderDistance());
-    SmartDashboard.putNumber("Gyro Angle", this.getAngle());
-    SmartDashboard.putNumber("Gyro Rate", this.getTurnRate());
+    //SmartDashboard.putNumber("R Encoder", this.getRightEncoderValue());
+    //SmartDashboard.putNumber("L Encoder", this.getLeftEncoderValue());
+    //SmartDashboard.putNumber("R Encoder Distance", this.getRightEncoderDistance());
+    //SmartDashboard.putNumber("L Encoder Distance", this.getLeftEncoderDistance());
+    //SmartDashboard.putNumber("Gyro Angle", this.getAngle());
+    //SmartDashboard.putNumber("Gyro Rate", this.getTurnRate());
 
     driveOdometry.update(Rotation2d.fromDegrees(getAngle()), getLeftEncoderDistance(), getRightEncoderDistance());
     // This method will be called once per scheduler run
